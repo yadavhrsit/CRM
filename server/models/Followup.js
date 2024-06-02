@@ -5,29 +5,40 @@ const followUpSchema = new mongoose.Schema(
     lead: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Lead",
-      required: true,
+      required: [true, "Lead is required"],
     },
     followDate: {
       type: Date,
-      required: true,
+      required: [true, "Follow-up date is required"],
+      validate: {
+        validator: function (v) {
+          return v >= new Date();
+        },
+        message: "Follow-up date cannot be in the past",
+      },
     },
     remarks: {
       type: String,
-      required: true,
-      maxlength: 700,
+      required: [true, "Remarks are required"],
+      maxlength: [700, "Remarks cannot exceed 700 characters"],
+      minlength: [10, "Remarks must have at least 10 characters"],
     },
     addedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: [true, "Added By is required"],
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "Assigned To is required"],
     },
     status: {
       type: String,
-      enum: ["open", "closed"],
+      enum: {
+        values: ["open", "closed"],
+        message: 'Status must be either "open" or "closed"',
+      },
       default: "open",
     },
   },
