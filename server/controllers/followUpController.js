@@ -1,11 +1,21 @@
 const FollowUp = require("../models/Followup");
+const Lead = require("../models/Lead");
 
 // create a new follow-up
 const createFollowUp = async (req, res, next) => {
   try {
-    const followUp = new FollowUp(req.body);
-    followUp.addedBy = req.user._id;
-    await followUp.save();
+    const lead = await Lead.findById(req.params.id);
+    if (!lead) {
+      return res.status(404).json({ message: "Lead not found" });
+    }
+
+    const followUp = await FollowUp.create({
+      lead: req.params.id,
+      ...req.body,
+    });
+
+    lead.followUps.push(followUp._id);
+    await lead.save();    
     res.status(201).json(followUp);
   } catch (error) {
     next(error);
