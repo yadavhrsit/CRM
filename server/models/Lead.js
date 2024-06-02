@@ -20,10 +20,10 @@ const leadSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    assignedTo: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
+    // assignedTo: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "User",
+    // },
     followUps: [
       {
         type: mongoose.Schema.Types.ObjectId,
