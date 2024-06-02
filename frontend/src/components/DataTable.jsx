@@ -1,4 +1,3 @@
-import React from "react";
 import { useTable, usePagination, useSortBy, useFilters } from "react-table";
 
 function DataTable({ data, columns }) {
@@ -33,10 +32,11 @@ function DataTable({ data, columns }) {
           className="min-w-full divide-y divide-gray-200"
         >
           <thead className="bg-gray-100">
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
+            {headerGroups.map((headerGroup, index) => (
+              <tr key={index} {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column, index) => (
                   <th
+                    key={index}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className="px-6 py-3 text-left text-sm text-gray-800 font-bold uppercase tracking-wider"
                   >
@@ -57,13 +57,14 @@ function DataTable({ data, columns }) {
             {...getTableBodyProps()}
             className="bg-white divide-y divide-gray-200"
           >
-            {page.map((row) => {
+            {page.map((row, index) => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()}>
-                  {row.cells.map((cell) => {
+                <tr key={index} {...row.getRowProps()}>
+                  {row.cells.map((cell,index) => {
                     return (
                       <td
+                        key={index}
                         {...cell.getCellProps()}
                         className="px-6 py-4 whitespace-nowrap"
                       >

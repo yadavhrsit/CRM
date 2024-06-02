@@ -4,7 +4,7 @@ import Swal from "sweetalert2";
 function AdminDashboard() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
-  if (!token || user.role !== "employee") {
+  if (!token || user.role !== "admin") {
     Swal.fire({
       icon: "error",
       title: "Access Denied",

@@ -1,6 +1,6 @@
 // AuthContext.js
-import React, { createContext, useState, useContext, useEffect } from "react";
-
+import { createContext, useState, useContext, useEffect } from "react";
+import axios from "axios";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -25,8 +25,14 @@ export const AuthProvider = ({ children }) => {
     // Check if token exists
     if (token) {
       // Decode token to get user data
-      const decodedToken = 
-      setUser(decodedToken.user);
+      axios.get("http://localhost:5000/users/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }).then(response => {
+        const decodedToken = response.data;
+        setUser(decodedToken.user);
+      });
     }
   }, [token]);
 
