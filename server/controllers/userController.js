@@ -10,19 +10,26 @@ const createUser = async (req, res, next) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, password, role } = req.body;
+    const { username, password, role, name, mobile, email, status } = req.body;
 
-    // Check if the username already exists
-    const userExists = await User.findOne({ username });
+    // Check if the username or email already exists
+    const userExists = await User.findOne({ $or: [{ username }, { email }] });
     if (userExists) {
-      return res.status(400).json({ message: "Username already exists" });
+      return res
+        .status(400)
+        .json({ message: "Username or Email already exists" });
     }
 
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     // Create a new user
-    const newUser = new User({ username, password: hashedPassword, role });
+    const newUser = new User({
+      username,
+      password,
+      role,
+      name,
+      mobile,
+      email,
+      status,
+    });
     await newUser.save();
 
     res.status(201).json({ message: "User created successfully" });
@@ -31,7 +38,7 @@ const createUser = async (req, res, next) => {
   }
 };
 
-// Get all users
+// Get all users with pagination, searching, and sorting
 const getUsers = async (req, res, next) => {
   try {
     const {
@@ -48,18 +55,25 @@ const getUsers = async (req, res, next) => {
         $or: [
           { username: { $regex: search, $options: "i" } },
           { role: { $regex: search, $options: "i" } },
+          { name: { $regex: search, $options: "i" } },
+          { email: { $regex: search, $options: "i" } },
         ],
       };
     }
 
-    const options = {
+    const users = await User.find(query)
+      .sort({ [sortBy]: sortOrder })
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
+
+    const total = await User.countDocuments(query);
+
+    res.json({
+      users,
+      total,
       page: parseInt(page),
       limit: parseInt(limit),
-      sort: { [sortBy]: sortOrder },
-    };
-
-    const users = await User.paginate(query, options);
-    res.json(users);
+    });
   } catch (error) {
     next(error);
   }
@@ -68,7 +82,7 @@ const getUsers = async (req, res, next) => {
 // Get a single user by ID
 const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select("-password");
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -78,35 +92,41 @@ const getUserById = async (req, res, next) => {
   }
 };
 
-// Get logged in user
+// Get logged-in user
 const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id).select("-password");
     res.json(user);
   } catch (error) {
     next(error);
   }
 };
 
-// Update logged in user
+// Update logged-in user
 const updateProfile = async (req, res, next) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, mobile, email } = req.body;
 
-    // Check if the user exists
     let user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Hash the new password if provided
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
+    // Check if any field is updated
+    if (
+      username === user.username &&
+      mobile === user.mobile &&
+      email === user.email &&
+      password === user.password
+    ) {
+      return res.json({ message: "Nothing to update" });
     }
 
     // Update user details
-    user.username = username;
+    user.username = username || user.username;
+    user.mobile = mobile || user.mobile;
+    user.email = email || user.email;
+    user.password = password || user.password;
 
     await user.save();
     res.json({ message: "Profile updated successfully" });
@@ -118,23 +138,34 @@ const updateProfile = async (req, res, next) => {
 // Update a user
 const updateUser = async (req, res, next) => {
   try {
-    const { username, password, role } = req.body;
+    const { username, password, role, name, mobile, email, status } = req.body;
 
-    // Check if the user exists
     let user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Hash the new password if provided
-    if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      user.password = hashedPassword;
+    // Check if any field is updated
+    if (
+      username === user.username &&
+      role === user.role &&
+      mobile === user.mobile &&
+      email === user.email &&
+      name === user.name &&
+      status === user.status &&
+      password === user.password
+    ) {
+      return res.json({ message: "Nothing to update" });
     }
 
     // Update user details
-    user.username = username;
-    user.role = role;
+    user.username = username || user.username;
+    user.role = role || user.role;
+    user.mobile = mobile || user.mobile;
+    user.email = email || user.email;
+    user.name = name || user.name;
+    user.status = status || user.status;
+    user.password = password || user.password;
 
     await user.save();
     res.json({ message: "User updated successfully" });
