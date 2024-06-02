@@ -25,6 +25,8 @@ const userSchema = new mongoose.Schema(
 // Mobile
 // Email
 
+// STATUS - ENABLE DISABLE FOR LOGIN
+
 const User = mongoose.model("User", userSchema);
 
 module.exports = User;
