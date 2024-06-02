@@ -13,8 +13,8 @@ const {
 const verifyToken = require("../middlewares/authMiddleware");
 const roleMiddleware = require("../middlewares/roleMiddleware");
 
-// Route to create a new follow-up
-router.post("/", verifyToken, createFollowUp);
+// Route to create a new follow-up by using a lead ID
+router.post("/:id", verifyToken, createFollowUp);
 
 // Route to get all follow-ups
 router.get("/", verifyToken, getFollowUps);
@@ -23,15 +23,15 @@ router.get("/", verifyToken, getFollowUps);
 router.get("/lead/:id", verifyToken, getFollowUpsByLeadId);
 
 // Route to get follow-up by assigned user ID
-router.get("/user/:id", verifyToken, getFollowUpsByAssignedUser);
+router.get("/assigned-user/:id", verifyToken, getFollowUpsByAssignedUser);
 
 // Route to get follow-up by added user ID
-router.get("/added/:id", verifyToken, getFollowUpsByAddedUser);
+router.get("/added-by-user/:id", verifyToken, getFollowUpsByAddedUser);
 
-// Route to get follow-up by ID
+// Route to get a follow-up by ID
 router.get("/:id", verifyToken, getFollowUpById);
 
-// Route to update follow-up
+// Route to update a follow-up
 router.put("/:id", verifyToken, roleMiddleware(["admin"]), updateFollowUp);
 
 // Route to delete follow-up
