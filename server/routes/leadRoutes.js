@@ -5,6 +5,7 @@ const {
   createLead,
   getLeads,
   getLeadById,
+  getLeadsByAddedUser,
   updateLead,
   deleteLead,
 } = require("../controllers/leadController");
@@ -14,9 +15,9 @@ const roleMiddleware = require("../middlewares/roleMiddleware");
 // Validation middleware for creating or updating a lead
 const validateLead = [
   body("company", "Company name is required").notEmpty(),
-  body("name", "Name is required").notEmpty(),
-  body("mobile", "Mobile number is required").notEmpty(),
-  body("email", "Email is required").notEmpty().isEmail(),
+  body("name", "Contact Person Name is required").notEmpty(),
+  body("mobile", "Contact Person Mobile number is required").notEmpty(),
+  body("email", "Contact Person Email is required").notEmpty().isEmail(),
   body("query", "Query is required").notEmpty(),
   (req, res, next) => {
     const errors = validationResult(req);
@@ -35,6 +36,9 @@ router.get("/", verifyToken, getLeads);
 
 // Route to get lead by ID
 router.get("/:id", verifyToken, getLeadById);
+
+// Route to get leads by added user ID
+router.get("/added-by-user/:id", verifyToken, getLeadsByAddedUser);
 
 // Route to update lead
 router.put(

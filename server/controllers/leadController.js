@@ -1,5 +1,6 @@
 // controllers/leadController.js
 const Lead = require("../models/Lead");
+const FollowUp = require("../models/Followup");
 
 // Create a new lead
 const createLead = async (req, res, next) => {
@@ -69,6 +70,16 @@ const getLeadById = async (req, res, next) => {
   }
 };
 
+// Get all leads by a user
+const getLeadsByAddedUser = async (req, res, next) => {
+  try {
+    const leads = await Lead.find({ addedBy: req.params.id });
+    res.json(leads);
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Update a lead
 const updateLead = async (req, res, next) => {
   try {
@@ -97,4 +108,11 @@ const deleteLead = async (req, res, next) => {
   }
 };
 
-module.exports = { createLead, getLeads, getLeadById, updateLead, deleteLead };
+module.exports = {
+  createLead,
+  getLeads,
+  getLeadById,
+  updateLead,
+  deleteLead,
+  getLeadsByAddedUser,
+};
