@@ -14,7 +14,7 @@ const login = async (req, res, next) => {
         { email: identifier },
         { phone: identifier },
       ],
-    });
+    }).select("+password");
 
     if (!user) {
       return res.status(401).json({ message: "Invalid User" });
@@ -23,7 +23,8 @@ const login = async (req, res, next) => {
     if (user.status !== "enabled") {
       return res.status(401).json({ message: "Your account has been disabled. Please contact Admin" });
     }
-
+    console.log(password);
+    console.log(user);
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       return res.status(401).json({ message: "Invalid Password" });
@@ -32,7 +33,7 @@ const login = async (req, res, next) => {
     const token = jwt.sign({ userId: user._id, role: user.role }, jwtSecret, {
       expiresIn: "30d",
     });
-    res.json({ token });
+    res.json({ token,user });
   } catch (error) {
     next(error);
   }
