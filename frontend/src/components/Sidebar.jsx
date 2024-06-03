@@ -1,7 +1,8 @@
 import { useContext, useEffect, useRef } from "react";
 import { ThemeContext } from "../context/ThemeContext";
 import { LIGHT_THEME } from "../constants/themeConstants";
-import logo from "../assets/images/save-money.png";
+import lightLogo from "../assets/images/logo_blue.svg";
+import darkLogo from "../assets/images/logo_white.svg";
 import {
   MdOutlineClose,
   MdOutlineGridView,
@@ -54,12 +55,12 @@ const Sidebar = () => {
       <div className="sidebar-top">
         <div className="sidebar-brand">
           <img
-            src={theme === LIGHT_THEME ? logo : logo}
+            src={theme === LIGHT_THEME ? lightLogo : darkLogo}
             alt=""
-            height={50}
+            height={60}
             width={60}
           />
-          <span className="sidebar-brand-text text-right">Saving Up</span>
+          <span className="sidebar-brand-text text-right">Hatch CRM</span>
         </div>
         <button className="sidebar-close-btn" onClick={closeSidebar}>
           <MdOutlineClose size={24} />
