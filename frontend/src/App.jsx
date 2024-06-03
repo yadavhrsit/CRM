@@ -13,13 +13,15 @@ import MoonIcon from "./assets/icons/moon.svg";
 import SunIcon from "./assets/icons/sun.svg";
 import BaseLayout from "./layout/BaseLayout";
 import PageNotFound from "./screens/PageNotFound";
-import Dashboard from "./screens/Dashboard";
-import Settings from "./screens/Settings";
 import Login from "./screens/Login";
-import Signup from "./screens/Signup";
+import AdminDashboard from "./screens/AdminDashboard";
+import EmployeeDashboard from "./screens/EmployeeDashboard";
+import Settings from "./screens/Settings";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
   const { theme, toggleTheme } = useContext(ThemeContext);
+  const { token, user } = useAuth();
 
   useEffect(() => {
     if (theme === DARK_THEME) {
@@ -34,10 +36,23 @@ function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Signup />} />
+
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/dashboard"
+              element={
+                token ? (
+                  user.role === "admin" ? (
+                    <AdminDashboard />
+                  ) : (
+                    <EmployeeDashboard />
+                  )
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            ></Route>
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>

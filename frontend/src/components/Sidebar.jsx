@@ -11,11 +11,13 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import { SidebarContext } from "../context/SidebarContext";
+import { useAuth } from "../context/AuthContext"; // Import useAuth hook
 
 const Sidebar = () => {
   const { theme } = useContext(ThemeContext);
   const { isSidebarOpen, closeSidebar } = useContext(SidebarContext);
   const navbarRef = useRef(null);
+  const { logout } = useAuth(); // Destructure logout function from useAuth hook
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -36,8 +38,13 @@ const Sidebar = () => {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleLogout = () => {
+    logout(); // Call the logout function when the logout button is clicked
+    navigate("/login"); // Redirect to the login page after logout
+  };
 
   return (
     <nav
@@ -93,20 +100,12 @@ const Sidebar = () => {
               </Link>
             </li>
             <li className="menu-item">
-              <Link to="/" className="menu-link">
+              <button className="menu-link" onClick={handleLogout}>
                 <span className="menu-link-icon">
                   <MdOutlineLogout size={20} />
                 </span>
-                <button
-                  className="menu-link-text"
-                  onClick={() => {
-                    localStorage.removeItem("saving_up_token");
-                    navigate("/login"); 
-                  }}
-                >
-                  Logout
-                </button>
-              </Link>
+                <span className="menu-link-text">Logout</span>
+              </button>
             </li>
           </ul>
         </div>

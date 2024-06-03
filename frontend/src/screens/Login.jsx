@@ -1,14 +1,16 @@
 import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeContext";
 import { BASE_URL } from "../constants/api";
+import { useAuth } from "../context/AuthContext"; // Import useAuth hook
 
 function Login() {
   const navigate = useNavigate();
   const { theme } = useContext(ThemeContext);
+  const { login } = useAuth(); // Destructure login function from useAuth hook
 
   const [formData, setFormData] = useState({
-    email: "",
+    identifier: "",
     password: "",
   });
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,7 @@ function Login() {
     setError("");
 
     try {
-      const response = await fetch(`${BASE_URL}/api/user/login`, {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,13 +40,14 @@ function Login() {
       setLoading(false);
 
       if (response.ok) {
-        localStorage.setItem("saving_up_token", data.token);
+        login(data.token, data.user); 
         setSuccess("Sign In successful.");
         setTimeout(() => {
           navigate("/dashboard");
         }, 1000);
       } else {
-        setError(data.error);
+        console.log(data);
+        setError(data.message);
       }
     } catch (error) {
       setError("Something went wrong. Please try again.");
@@ -92,19 +95,19 @@ function Login() {
           onSubmit={handleSubmit}
         >
           <label
-            htmlFor="email"
+            htmlFor="identifier"
             className={`${
               theme === "dark" ? "text-gray-50" : "text-zinc-500"
             }  font-semibold text-left text-sm block my-1`}
           >
-            Email address:
+            Enter Name/Email/Phone Number:
           </label>
           <input
-            type="email"
-            name="email"
-            value={formData.email}
+            type="text"
+            name="identifier"
+            value={formData.identifier}
             onChange={handleInputChange}
-            placeholder="johndoe@gmail.com"
+            placeholder="johndoe13 or johndoe@gmail.com or 123-456-7890"
             className="block bg-zinc-200 p-2 rounded font-medium"
             style={{ width: "100%" }}
             required
@@ -136,9 +139,6 @@ function Login() {
               {showPassword ? "👁️" : "🔒"}
             </button>
           </div>
-          <Link to={"/register"} className="mt-2">
-            Not a registered user? Signup
-          </Link>
           {error && <p className="text-red-500 mt-2">{error}</p>}
           {success && <p className="text-green-500 mt-2">{success}</p>}
           <div
