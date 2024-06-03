@@ -1,6 +1,6 @@
 // controllers/leadController.js
 const Lead = require("../models/Lead");
-const FollowUp = require("../models/Followup");
+
 
 // Create a new lead
 const createLead = async (req, res, next) => {

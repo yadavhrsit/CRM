@@ -1,4 +1,4 @@
-const FollowUp = require("../models/Followup");
+const FollowUp = require("../models/FollowUp");
 const Lead = require("../models/Lead");
 
 // create a new follow-up
@@ -9,13 +9,25 @@ const createFollowUp = async (req, res, next) => {
       return res.status(404).json({ message: "Lead not found" });
     }
 
+    if (lead.status !== "open") {
+      return res.status(400).json({
+        message: `Cannot create follow-up for a lead with status ${lead.status}`,
+      });
+    }
+
+    // Check if the assigned user is enabled
+    const assignedUser = await User.findById(req.body.assignedTo);
+    if (!assignedUser || !assignedUser.enabled) {
+      return res.status(400).json({ message: "This user has been disabled." });
+    }
+
     const followUp = await FollowUp.create({
       lead: req.params.id,
       ...req.body,
     });
 
     lead.followUps.push(followUp._id);
-    await lead.save();    
+    await lead.save();
     res.status(201).json(followUp);
   } catch (error) {
     next(error);
