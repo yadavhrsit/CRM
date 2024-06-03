@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema(
   {
     username: {
       type: String,
-      unique: true,
+      unique: [true, "Username already exists"],
       required: [true, "Please enter a username"],
       trim: true,
       minlength: [3, "Username must be at least 3 characters long"],
@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema(
     },
     mobile: {
       type: String,
+      unique: [true, "Mobile number already registered"],
       required: [true, "Please enter your mobile number"],
       validate: {
         validator: function (v) {
@@ -39,8 +40,8 @@ const userSchema = new mongoose.Schema(
     },
     email: {
       type: String,
+      unique: [true, "Email already registered"],
       required: [true, "Please enter your email"],
-      unique: true,
       lowercase: true,
       validate: [validator.isEmail, "Please provide a valid email"],
     },
