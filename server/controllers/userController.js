@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
 // Create a new user
@@ -79,13 +79,20 @@ const getUsers = async (req, res, next) => {
   }
 };
 
-// Get a single user by ID
+// Get user by ID
 const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'Invalid user ID' });
     }
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
     res.json(user);
   } catch (error) {
     next(error);
@@ -95,7 +102,7 @@ const getUserById = async (req, res, next) => {
 // Get logged-in user
 const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(new mongoose.Types.ObjectId(req.user.userId)).select("-password");
     res.json(user);
   } catch (error) {
     next(error);

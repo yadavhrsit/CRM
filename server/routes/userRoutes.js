@@ -37,11 +37,11 @@ router.post(
 // Route to get all users
 router.get("/", verifyToken, getUsers);
 
-// Route to get user by ID
-router.get("/:id", verifyToken, getUserById);
-
 // Route to get logged in user
 router.get("/profile", verifyToken, getProfile);
+
+// Route to get user by ID
+router.get("/:id", verifyToken, getUserById);
 
 // Route to update logged in user
 router.put("/profile", verifyToken, updateProfile);

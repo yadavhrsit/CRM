@@ -32,8 +32,8 @@ export const AuthProvider = ({ children }) => {
           },
         })
         .then((response) => {
-          const decodedToken = response.data;
-          setUser(decodedToken.user);
+          const user = response.data;
+          setUser(user);
         });
     }
   }, [token]);
