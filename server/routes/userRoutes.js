@@ -5,6 +5,7 @@ const {
   getUsers,
   getUserById,
   getProfile,
+  getDashboard,
   updateProfile,
   updateUser,
   deleteUser,
@@ -39,6 +40,9 @@ router.get("/", verifyToken, getUsers);
 
 // Route to get logged in user
 router.get("/profile", verifyToken, getProfile);
+
+// Route to get logged in user dashboard
+router.get("/dashboard", verifyToken, getDashboard);
 
 // Route to get user by ID
 router.get("/:id", verifyToken, getUserById);

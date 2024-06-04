@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Lead = require("../models/Lead");
+const FollowUp = require("../models/FollowUp");
 const mongoose = require("mongoose");
 const { validationResult } = require("express-validator");
 
@@ -109,6 +111,99 @@ const getProfile = async (req, res, next) => {
   }
 };
 
+// Get logged-in user dashboard
+const getDashboard = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+
+    // Get start and end of today
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Count all leads
+    const totalLeads = await Lead.countDocuments({});
+    const userTotalLeads = await Lead.countDocuments({ addedBy: userId });
+
+    // Count leads created today
+    const todayLeads = await Lead.countDocuments({
+      createdAt: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    });
+
+    const todayUserLeads = await Lead.countDocuments({
+      addedBy: userId,
+      createdAt: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    });
+
+    // Count won, lost, and closed leads
+    const wonLeadsCount = await Lead.countDocuments({ status: "won" });
+    const lostLeadsCount = await Lead.countDocuments({ status: "lost" });
+    const closedLeadsCount = wonLeadsCount + lostLeadsCount;
+
+    // Count upcoming follow-ups and today's follow-ups for the user
+    const allUserFollowUps = await FollowUp.find({ assignedTo: userId });
+
+    // Calculate upcoming follow-ups count for the user
+    const today = new Date();
+    const upcomingFollowUpsCount = await FollowUp.countDocuments({
+      assignedTo: userId,
+      followDate: { $gte: today }, // Filter for follow-up dates today or in the future
+    });
+
+    // Calculate today's follow-ups count for the user
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0); // Set hours, minutes, seconds, and milliseconds to 0 to get the start of the day
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999); // Set hours, minutes, seconds, and milliseconds to the end of the day
+    const todayFollowUpsCount = await FollowUp.countDocuments({
+      assignedTo: userId,
+      followDate: { $gte: startOfToday, $lte: endOfToday }, // Filter for follow-up dates within today
+    });
+
+    // Count leads closed by the user
+    const userClosedLeads = await Lead.countDocuments({
+      addedBy: userId,
+      status: { $in: ["won", "lost"] },
+    });
+
+    const userWonLeadsCount = await Lead.countDocuments({
+      addedBy: userId,
+      status: "won",
+    });
+
+    const userLostLeadsCount = await Lead.countDocuments({
+      addedBy: userId,
+      status: "lost",
+    });
+
+    res.json({
+      totalLeads,
+      userTotalLeads,
+      todayLeads,
+      todayUserLeads,
+      wonLeadsCount,
+      lostLeadsCount,
+      closedLeadsCount,
+      upcomingFollowUpsCount,
+      todayFollowUpsCount,
+      userClosedLeads,
+      userWonLeadsCount,
+      userLostLeadsCount,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // Update logged-in user
 const updateProfile = async (req, res, next) => {
   try {
@@ -200,6 +295,7 @@ module.exports = {
   getUsers,
   getUserById,
   getProfile,
+  getDashboard,
   updateProfile,
   updateUser,
   deleteUser,

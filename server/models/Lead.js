@@ -35,7 +35,7 @@ const leadSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["open", "won", "loss"],
+      enum: ["open", "won", "lost"],
       default: "open",
     },
     addedBy: {

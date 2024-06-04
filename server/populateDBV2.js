@@ -1,7 +1,7 @@
 require("dotenv").config();
 const mongoose = require("mongoose");
-const { faker } = require("@faker-js/faker");
 const bcrypt = require("bcryptjs");
+const { faker } = require("@faker-js/faker");
 const User = require("./models/User");
 const Company = require("./models/Company");
 const Lead = require("./models/Lead");
@@ -33,12 +33,12 @@ async function createDummyData() {
   const users = [];
   for (let i = 0; i < 10; i++) {
     const user = new User({
-      username: faker.internet.userName(),
+      username: `user${i}`,
       password: await bcrypt.hash("password123", 12),
       role: i === 0 ? "admin" : "employee",
-      name: faker.name.fullName(),
-      mobile: faker.phone.number("##########"),
-      email: faker.internet.email(),
+      name: `User ${i}`,
+      mobile: `123456789${i}`, // Unique mobile number for each user
+      email: `user${i}@example.com`,
       status: "enabled",
     });
     users.push(user);
@@ -49,7 +49,7 @@ async function createDummyData() {
   const companies = [];
   for (let i = 0; i < 10; i++) {
     const company = new Company({
-      name: faker.company.name(),
+      name: `Company ${i}`,
     });
     companies.push(company);
   }
@@ -57,27 +57,34 @@ async function createDummyData() {
 
   // Create leads
   const leads = [];
+  const today = new Date();
   for (let i = 0; i < 50; i++) {
     const lead = new Lead({
-      company: companies[faker.datatype.number({ min: 0, max: 9 })]._id,
-      name: faker.name.fullName(),
-      email: faker.internet.email(),
-      mobile: faker.phone.number("##########"),
-      query: faker.lorem.sentence(),
-      status: faker.helpers.arrayElement(["open", "won", "lost"]),
-      addedBy: users[faker.datatype.number({ min: 0, max: 9 })]._id,
+      company: companies[i % 10]._id,
+      name: `Lead ${i}`,
+      email: `lead${i}@example.com`,
+      mobile: "1234567890",
+      query: `Query ${i}`,
+      status: i % 3 === 0 ? "won" : i % 3 === 1 ? "lost" : "open",
+      addedBy: users[i % 10]._id,
       followUps: [],
+      createdAt: today, // Leads created today
     });
     leads.push(lead);
   }
   await Lead.insertMany(leads);
 
+  // Create follow-ups for leads
   // Create follow-ups
   const followUps = [];
   for (let i = 0; i < 100; i++) {
+    const futureDate = new Date();
+    futureDate.setDate(
+      futureDate.getDate() + faker.datatype.number({ min: 1, max: 30 })
+    ); // Adding 1 to 30 days to the current date
     const followUp = new FollowUp({
       lead: leads[faker.datatype.number({ min: 0, max: 49 })]._id,
-      followDate: faker.date.future(),
+      followDate: futureDate,
       remarks: faker.lorem.sentence(),
       addedBy: users[faker.datatype.number({ min: 0, max: 9 })]._id,
       assignedTo: users[faker.datatype.number({ min: 0, max: 9 })]._id,

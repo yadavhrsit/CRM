@@ -9,10 +9,10 @@ const followUpSchema = new mongoose.Schema(
     },
     followDate: {
       type: Date,
-      required: [true, "Follow-up date is required"],
+      required: true,
       validate: {
-        validator: function (v) {
-          return v >= new Date();
+        validator: function (value) {
+          return value >= new Date(); // Ensure follow-up date is not in the past
         },
         message: "Follow-up date cannot be in the past",
       },
