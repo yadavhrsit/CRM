@@ -1,18 +1,26 @@
 // controllers/leadController.js
 const Lead = require("../models/Lead");
-
+const Company = require("../models/Company");
 
 // Create a new lead
 const createLead = async (req, res, next) => {
   try {
-    const lead = await Lead.create(req.body);
+    let company = await Company.findOne({ name: req.body.company });
+    if (!company) {
+      company = await Company.create({ name: req.body.company });
+    }
+    const lead = await Lead.create({
+      ...req.body,
+      addedBy: req.user.userId,
+      company: company._id,
+    });
     res.status(201).json(lead);
   } catch (error) {
     next(error);
   }
 };
 
-// Get all leads 
+// Get all leads
 const getLeads = async (req, res, next) => {
   try {
     const { search, status, sortBy, sortOrder, page, limit } = req.query;

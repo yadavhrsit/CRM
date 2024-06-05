@@ -4,6 +4,7 @@ const companySchema = new mongoose.Schema(
   {
     name: {
       type: String,
+      lowercase: true,
       required: [true, "Company name is required"],
       unique: true,
       trim: true,

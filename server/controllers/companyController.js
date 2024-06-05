@@ -4,7 +4,7 @@ const Company = require("../models/Company");
 const createCompany = async (req, res, next) => {
   try {
     const company = await Company.create(req.body);
-    res.status(201).json(company);
+    res.status(201).json(company._id);
   } catch (error) {
     next(error);
   }

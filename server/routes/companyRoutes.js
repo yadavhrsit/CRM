@@ -29,7 +29,7 @@ router.post("/", verifyToken, validateCompany, createCompany);
 router.get("/", verifyToken, getCompanies);
 
 // Route to get company by ID
-router.get("/:id", verifyToken, getCompanyById);
+router.get("/view/:id", verifyToken, getCompanyById);
 
 // Route to update company
 router.put("/:id", verifyToken, validateCompany, updateCompany);
