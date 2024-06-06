@@ -69,7 +69,7 @@ const Sidebar = () => {
       <div className="sidebar-body">
         <div className="sidebar-menu">
           <ul className="menu-list">
-            <li className="menu-item">
+            <li className="menu-item my-1">
               <Link
                 to="/dashboard"
                 className={`menu-link ${
@@ -80,6 +80,32 @@ const Sidebar = () => {
                   <MdOutlineGridView size={18} />
                 </span>
                 <span className="menu-link-text">Dashboard</span>
+              </Link>
+            </li>
+            <li className="menu-item my-1">
+              <Link
+                to="/leads"
+                className={`menu-link ${
+                  location.pathname.includes("leads") && "active"
+                }`}
+              >
+                <span className="menu-link-icon">
+                  <MdOutlineGridView size={18} />
+                </span>
+                <span className="menu-link-text">Leads</span>
+              </Link>
+            </li>
+            <li className="menu-item my-1">
+              <Link
+                to="/follow-ups"
+                className={`menu-link ${
+                  location.pathname.includes("follow-ups") && "active"
+                }`}
+              >
+                <span className="menu-link-icon">
+                  <MdOutlineGridView size={18} />
+                </span>
+                <span className="menu-link-text">Follow Ups</span>
               </Link>
             </li>
           </ul>

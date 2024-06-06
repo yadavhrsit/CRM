@@ -16,6 +16,8 @@ import PageNotFound from "./screens/PageNotFound";
 import Login from "./screens/Login";
 import AdminDashboard from "./screens/AdminDashboard";
 import EmployeeDashboard from "./screens/EmployeeDashboard";
+import Leads from "./screens/Leads";
+import FollowUps from "./screens/FollowUps";
 import Settings from "./screens/Settings";
 import { useAuth } from "./context/AuthContext";
 
@@ -39,20 +41,20 @@ function App() {
 
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Navigate to="/dashboard" />} />
-            <Route
-              path="/dashboard"
-              element={
-                token ? (
-                  user.role === "admin" ? (
-                    <AdminDashboard />
-                  ) : (
-                    <EmployeeDashboard />
-                  )
+            <Route path="/dashboard"
+            element={
+              token ? (
+                user.role === "admin" ? (
+                  <AdminDashboard />
                 ) : (
-                  <Navigate to="/login" />
+                  <EmployeeDashboard />
                 )
-              }
-            ></Route>
+              ) : (
+                <Navigate to="/login" />
+              )
+            } />
+            <Route path="/leads" element={<Leads />} />
+            <Route path="/follow-ups" element={<FollowUps />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>
