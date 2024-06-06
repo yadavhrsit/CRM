@@ -8,6 +8,7 @@ import axios from "axios";
 import AreaTop from "../components/AreaTop";
 import DataCard from "../components/DataCard";
 import { MdPerson, MdEvent, MdAddCircle, MdAlarm } from "react-icons/md";
+import CustomPieChart from "../components/PieChart";
 
 function EmployeeDashboard() {
   const navigate = useNavigate();
@@ -21,6 +22,10 @@ function EmployeeDashboard() {
   }
 
   const [dashboardData, setDashboardData] = useState({});
+  const [leadChartData, setLeadChartData] = useState([]);
+  const [leadChartInfo, setLeadChartInfo] = useState({});
+  const [userLeadsChartData, setUserLeadsChartData] = useState([]);
+  const [userLeadsChartInfo, setUserLeadsChartInfo] = useState({});
 
   useEffect(() => {
     async function fetchData() {
@@ -29,18 +34,71 @@ function EmployeeDashboard() {
           headers: { Authorization: token },
         });
         setDashboardData(response.data);
-        console.log(response.data);
+        setLeadChartData([
+          {
+            name: "Closed Leads",
+            value: response.data.closedLeadsCount || 0,
+            color: "#4caf50",
+          },
+          {
+            name: "Lost Leads",
+            value: response.data.lostLeadsCount || 0,
+            color: "#f44336",
+          },
+          {
+            name: "Won Leads",
+            value: response.data.wonLeadsCount || 0,
+            color: "#2196f3",
+          },
+        ]);
+        setLeadChartInfo({
+          title: "Overall Leads",
+          totalLeads: response.data.totalLeads,
+          closedLeadsCount: response.data.closedLeadsCount,
+          openLeadsCount:
+            response.data.totalLeads - response.data.closedLeadsCount,
+        });
+
+        setUserLeadsChartData([
+          {
+            name: "Closed Leads",
+            value: response.data.userClosedLeads || 0,
+            color: "#4caf50",
+          },
+          {
+            name: "Lost Leads",
+            value: response.data.userLostLeadsCount || 0,
+            color: "#f44336",
+          },
+          {
+            name: "Won Leads",
+            value: response.data.userWonLeadsCount || 0,
+            color: "#2196f3",
+          },
+        ]);
+
+        setUserLeadsChartInfo({
+          title: `Leads Created by ${user.name}`,
+          totalLeads: response.data.userTotalLeads,
+          closedLeadsCount: response.data.userClosedLeads,
+          openLeadsCount:
+            response.data.userTotalLeads - response.data.userClosedLeads,
+        });
+
       } catch (error) {
         console.error(error);
       }
     }
     fetchData();
-  }, [token]);
+  }, [token,user.name]);
 
   return (
     <div>
       <AreaTop title={"Dashboard"} />
-      <div className="px-2 py-6 bg-slate-50 dark:bg-zinc-600 rounded-lg mt-4">
+      <section
+        id="data-card"
+        className="px-2 py-6 bg-slate-50 dark:bg-zinc-600 rounded-lg mt-4"
+      >
         <h2 className="text-xl font-semibold m-2 text-zinc-900 dark:text-zinc-200">
           All time
         </h2>
@@ -87,7 +145,24 @@ function EmployeeDashboard() {
             color={"#5E8AEA"}
           />
         </div>
-      </div>
+      </section>
+      <section
+        id="data-chart"
+        className="px-2 py-6 bg-slate-50 dark:bg-zinc-600 rounded-lg mt-4"
+      >
+        <h2 className="text-xl font-semibold m-2 text-zinc-900 dark:text-zinc-200">
+          Leads by Source
+        </h2>
+        {dashboardData && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            <CustomPieChart pieData={leadChartData} infoData={leadChartInfo} />
+            <CustomPieChart
+              pieData={userLeadsChartData}
+              infoData={userLeadsChartInfo}
+            />
+          </div>
+        )}
+      </section>
     </div>
   );
 }
