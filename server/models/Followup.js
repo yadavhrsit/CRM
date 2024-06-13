@@ -12,7 +12,9 @@ const followUpSchema = new mongoose.Schema(
       required: true,
       validate: {
         validator: function (value) {
-          return value >= new Date(); // Ensure follow-up date is not in the past
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          return value >= today; // Ensure follow-up date is not in the past
         },
         message: "Follow-up date cannot be in the past",
       },

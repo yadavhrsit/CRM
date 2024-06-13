@@ -1,28 +1,17 @@
 import { useTable, usePagination, useSortBy, useFilters } from "react-table";
 
-function DataTable({ data, columns }) {
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headerGroups,
-    prepareRow,
-    page,
-    canPreviousPage,
-    canNextPage,
-    nextPage,
-    previousPage,
-    state: { pageIndex },
-    pageOptions,
-  } = useTable(
-    {
-      columns,
-      data,
-      initialState: { pageIndex: 0 },
-    },
-    useFilters,
-    useSortBy,
-    usePagination
-  );
+function DataTable({ data, columns, handleRowClick }) {
+  const { getTableProps, getTableBodyProps, headerGroups, prepareRow, page } =
+    useTable(
+      {
+        columns,
+        data,
+        initialState: { pageIndex: 0 },
+      },
+      useFilters,
+      useSortBy,
+      usePagination
+    );
 
   return (
     <>
@@ -31,14 +20,14 @@ function DataTable({ data, columns }) {
           {...getTableProps()}
           className="min-w-full divide-y divide-gray-200"
         >
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 dark:bg-gray-800">
             {headerGroups.map((headerGroup, index) => (
               <tr key={index} {...headerGroup.getHeaderGroupProps()}>
                 {headerGroup.headers.map((column, index) => (
                   <th
                     key={index}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="px-6 py-3 text-left text-sm text-gray-800 font-bold uppercase tracking-wider"
+                    className="px-6 py-3 text-left text-sm text-gray-800 dark:text-white font-bold uppercase tracking-wider"
                   >
                     {column.render("Header")}
                     <span>
@@ -55,18 +44,23 @@ function DataTable({ data, columns }) {
           </thead>
           <tbody
             {...getTableBodyProps()}
-            className="bg-white divide-y divide-gray-200"
+            className="bg-white dark:bg-slate-600 divide-y divide-gray-200 dark:divide-gray-900"
           >
             {page.map((row, index) => {
               prepareRow(row);
               return (
-                <tr key={index} {...row.getRowProps()}>
-                  {row.cells.map((cell,index) => {
+                <tr
+                  key={index}
+                  {...row.getRowProps()}
+                  onClick={() => handleRowClick(row)}
+                  className="cursor-pointer transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  {row.cells.map((cell, index) => {
                     return (
                       <td
                         key={index}
                         {...cell.getCellProps()}
-                        className="px-6 py-4 whitespace-nowrap"
+                        className="px-6 py-4 whitespace-nowrap overflow-hidden text-ellipsis dark:text-white max-w-xs max-h-1"
                       >
                         {cell.render("Cell")}
                       </td>
@@ -77,28 +71,6 @@ function DataTable({ data, columns }) {
             })}
           </tbody>
         </table>
-      </div>
-      <div className="flex justify-between p-4">
-        <button
-          onClick={() => previousPage()}
-          disabled={!canPreviousPage}
-          className="py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none"
-        >
-          Previous Page
-        </button>
-        <div className="py-2 px-4 font-semibold">
-          Page{" "}
-          <em>
-            {pageIndex + 1} of {pageOptions.length}
-          </em>
-        </div>
-        <button
-          onClick={() => nextPage()}
-          disabled={!canNextPage}
-          className="py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none"
-        >
-          Next Page
-        </button>
       </div>
     </>
   );

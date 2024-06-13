@@ -20,6 +20,9 @@ import Leads from "./screens/Leads";
 import FollowUps from "./screens/FollowUps";
 import Settings from "./screens/Settings";
 import { useAuth } from "./context/AuthContext";
+import LeadView from "./screens/LeadView";
+import UserView from "./screens/UserView";
+import Users from "./screens/Users";
 
 function App() {
   const { theme, toggleTheme } = useContext(ThemeContext);
@@ -46,15 +49,24 @@ function App() {
               token ? (
                 user.role === "admin" ? (
                   <AdminDashboard />
-                ) : (
+                ) : user.role === "employee" ? (
                   <EmployeeDashboard />
+                ) : (
+                  <div>Loading</div>
                 )
               ) : (
                 <Navigate to="/login" />
               )
             } />
-            <Route path="/leads" element={<Leads />} />
+            <Route path="/leads">
+              <Route index element={<Leads />} />
+              <Route path="/leads/:id" element={<LeadView />} />
+            </Route>
             <Route path="/follow-ups" element={<FollowUps />} />
+            <Route path="/users">
+              <Route index element={<Users />} />
+              <Route path="/users/:id" element={<UserView />} />
+            </Route>
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<PageNotFound />} />
           </Route>

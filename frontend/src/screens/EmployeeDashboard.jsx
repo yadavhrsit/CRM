@@ -13,7 +13,7 @@ import CustomPieChart from "../components/PieChart";
 function EmployeeDashboard() {
   const navigate = useNavigate();
   const { token, user } = useAuth();
-  if (!token || user.role !== "employee") {
+  if (!token) {
     Swal.fire({
       icon: "error",
       title: "Access Denied",
@@ -94,7 +94,7 @@ function EmployeeDashboard() {
 
   return (
     <div>
-      <AreaTop title={"Dashboard"} />
+      <AreaTop title={"Dashboard"} showAddLeadBtn={true}/>
       <section
         id="data-card"
         className="px-2 py-6 bg-slate-50 dark:bg-zinc-600 rounded-lg mt-4"

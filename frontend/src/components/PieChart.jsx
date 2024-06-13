@@ -18,8 +18,10 @@ const CustomPieChart = ({ pieData, infoData }) => {
           textAnchor="middle"
           className="text-lg font-semibold text-gray-900 dark:text-gray-100"
         >
-          Total Leads: {infoData.totalLeads}, Open Leads:{" "}
-          {infoData.openLeadsCount}
+          {infoData.totalLeads && " Total Leads: "}
+          {infoData.totalLeads} {""}
+          {infoData.openLeadsCount ? "Open Leads: " : "Closed Leads: "}
+          {infoData.openLeadsCount || infoData.closedLeadsCount}
         </text>
         <Pie
           data={pieData}
@@ -52,7 +54,11 @@ const CustomPieChart = ({ pieData, infoData }) => {
                 dominantBaseline="central"
               >
                 {pieData[index].name}: {value} (
-                {((value / infoData.totalLeads) * 100).toFixed(0)}%)
+                {(
+                  (value / infoData.totalLeads || value / infoData.closedLeadsCount) *
+                  100
+                ).toFixed(0)}
+                %)
               </text>
             );
           }}
@@ -65,8 +71,8 @@ const CustomPieChart = ({ pieData, infoData }) => {
         <Legend
           formatter={(value, entry) => {
             return `${entry.payload.name}: ${entry.payload.value} (${(
-              (entry.payload.value / infoData.totalLeads) *
-              100
+              (entry.payload.value / infoData.totalLeads ||
+                entry.payload.value / infoData.closedLeadsCount) * 100
             ).toFixed(0)}%)`;
           }}
           align="center"

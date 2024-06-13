@@ -45,13 +45,15 @@ const getUsers = async (req, res, next) => {
   try {
     const {
       page = 1,
-      limit = 10,
+      limit = 9999,
       sortBy = "createdAt",
       sortOrder = "desc",
       search,
     } = req.query;
 
-    let query = {};
+    let query = {
+      role: { $ne: "admin" },
+    };
     if (search) {
       query = {
         $or: [
@@ -72,7 +74,7 @@ const getUsers = async (req, res, next) => {
 
     res.json({
       users,
-      total,
+      totalPages: Math.ceil(total / limit),
       page: parseInt(page),
       limit: parseInt(limit),
     });
@@ -86,13 +88,13 @@ const getUserById = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid user ID' });
+      return res.status(400).json({ message: "Invalid user ID" });
     }
 
     const user = await User.findById(id);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.json(user);
@@ -104,7 +106,9 @@ const getUserById = async (req, res, next) => {
 // Get logged-in user
 const getProfile = async (req, res, next) => {
   try {
-    const user = await User.findById(new mongoose.Types.ObjectId(req.user.userId)).select("-password");
+    const user = await User.findById(
+      new mongoose.Types.ObjectId(req.user.userId)
+    ).select("-password");
     res.json(user);
   } catch (error) {
     next(error);
@@ -203,13 +207,79 @@ const getDashboard = async (req, res, next) => {
   }
 };
 
+// Get logged-in Admin dashboard
+const getAdminDashboard = async (req, res, next) => {
+  try {
+    // Get start and end of today
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Count all leads
+    const totalLeads = await Lead.countDocuments({});
+
+    // Count leads created today
+    const todayLeads = await Lead.countDocuments({
+      createdAt: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    });
+
+    // Count won, lost, and closed leads
+    const wonLeadsCount = await Lead.countDocuments({ status: "won" });
+    const lostLeadsCount = await Lead.countDocuments({ status: "lost" });
+    const closedLeadsCount = wonLeadsCount + lostLeadsCount;
+    const openLeadsCount = totalLeads - closedLeadsCount;
+
+    // Count all FollowUps
+    const totalFollowUps = await FollowUp.countDocuments({});
+
+    // Count follow-ups created today
+    const todayFollowUps = await FollowUp.countDocuments({
+      createdAt: {
+        $gte: startOfDay,
+        $lte: endOfDay,
+      },
+    });
+
+    // Count won, lost, and closed leads updated today
+    const todayWonLeads = await Lead.countDocuments({
+      status: "won",
+      updatedAt: { $gte: startOfDay, $lte: endOfDay },
+    });
+    const todayLostLeads = await Lead.countDocuments({
+      status: "lost",
+      updatedAt: { $gte: startOfDay, $lte: endOfDay },
+    });
+    const todayClosedLeads = todayWonLeads + todayLostLeads;
+
+    res.json({
+      totalLeads,
+      todayLeads,
+      wonLeadsCount,
+      lostLeadsCount,
+      closedLeadsCount,
+      openLeadsCount,
+      totalFollowUps,
+      todayFollowUps,
+      todayWonLeads,
+      todayLostLeads,
+      todayClosedLeads,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // Update logged-in user
 const updateProfile = async (req, res, next) => {
   try {
     const { username, password, mobile, email } = req.body;
 
-    let user = await User.findById(req.user.id);
+    let user = await User.findById(req.user.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -242,11 +312,14 @@ const updateUser = async (req, res, next) => {
   try {
     const { username, password, role, name, mobile, email, status } = req.body;
 
-    let user = await User.findById(req.params.id);
+    let user = await User.findById(req.params.id).select(
+      "username role name mobile email status password"
+    );
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
+    console.log(user);
+    console.log(username, password, role, name, mobile, email, status);
     // Check if any field is updated
     if (
       username === user.username &&
@@ -296,6 +369,7 @@ module.exports = {
   getUserById,
   getProfile,
   getDashboard,
+  getAdminDashboard,
   updateProfile,
   updateUser,
   deleteUser,

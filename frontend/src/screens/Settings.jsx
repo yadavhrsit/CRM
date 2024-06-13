@@ -1,16 +1,20 @@
-import  { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { BASE_URL } from "../constants/api";
 import AreaTop from "../components/AreaTop";
 import swal from "sweetalert2";
+import { useAuth } from "../context/AuthContext";
 
 function Settings() {
+  const { token } = useAuth();
   const [user, setUser] = useState({});
   const [initialUser, setInitialUser] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
+    username: "",
     name: "",
+    mobile: "",
     email: "",
     funds: 0,
     password: "",
@@ -20,32 +24,33 @@ function Settings() {
   const [unchangedMessage, setUnchangedMessage] = useState(null);
 
   useEffect(() => {
-    const fetchAdminDetails = async () => {
+    const fetchUserDetails = async () => {
       try {
-        const token = localStorage.getItem("saving_up_token");
-        const response = await axios.get(`${BASE_URL}/api/user/profile`, {
+        const response = await axios.get(`${BASE_URL}/users/profile`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
           },
         });
         const userData = response.data;
         setUser(userData);
         setInitialUser(userData);
         setFormData({
-          name: userData.username,
+          username: userData.username,
+          name: userData.name,
+          mobile: userData.mobile,
           email: userData.email,
           funds: userData.funds,
           password: "",
         });
         setLoading(false);
       } catch (error) {
-        setError(error.message);
+        setError(error.message || "Failed to fetch user details");
         setLoading(false);
       }
     };
 
-    fetchAdminDetails();
-  }, []);
+    fetchUserDetails();
+  }, [token]);
 
   const handleChange = (e) => {
     setFormData({
@@ -57,10 +62,14 @@ function Settings() {
   const validateForm = (data) => {
     let errors = {};
 
+    if (!data.username) errors.username = "Username is required";
     if (!data.name) errors.name = "Name is required";
     if (!data.email) errors.email = "Email is required";
-    if (data.email && !/\S+@\S+\.\S+/.test(data.email)) errors.email = "Invalid email address";
-    if (data.funds && isNaN(data.funds)) errors.funds = "Funds must be a number";
+    if (data.email && !/\S+@\S+\.\S+/.test(data.email))
+      errors.email = "Invalid email address";
+    if (!data.mobile) errors.mobile = "Mobile number is required";
+    if (data.mobile && !/^\d{10}$/.test(data.mobile))
+      errors.mobile = "Mobile number must be 10 digits";
     if (data.password && data.password.length < 6)
       errors.password = "Password must be at least 6 characters long";
 
@@ -80,9 +89,10 @@ function Settings() {
 
     // Check if form data is unchanged
     if (
-      formData.name === initialUser.username &&
+      formData.username === initialUser.username &&
+      formData.name === initialUser.name &&
       formData.email === initialUser.email &&
-      formData.funds === initialUser.funds &&
+      formData.mobile === initialUser.mobile &&
       formData.password === ""
     ) {
       setUnchangedMessage("No changes to update");
@@ -92,26 +102,33 @@ function Settings() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("saving_up_token");
-      const response = await axios.put(
-        `${BASE_URL}/api/user/profile/update`,
+      const response = await axios.patch(
+        `${BASE_URL}/users/profile`,
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `${token}`,
           },
         }
       );
-      setUser(response.data.data);
-      setInitialUser(response.data.data);
+      setUser(response.data);
+      setInitialUser(response.data);
       setSuccessMessage("Details updated successfully");
       setFormErrors({});
       setLoading(false);
       swal.fire("Success", "Details updated successfully", "success");
     } catch (error) {
-      setError(error.response.data.message || error.message);
+      setError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to update details"
+      );
       setLoading(false);
-      swal.fire("Error", error.response.data.message || error.message, "error");
+      swal.fire(
+        "Error",
+        error.response?.data?.message || error.message,
+        "error"
+      );
     }
   };
 
@@ -162,6 +179,19 @@ function Settings() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-gray-700 dark:text-gray-300">
+                Username:
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                readOnly
+              />
+            </div>
+            <div>
+              <label className="block text-gray-700 dark:text-gray-300">
                 Name:
               </label>
               <input
@@ -204,22 +234,22 @@ function Settings() {
             </div>
             <div>
               <label className="block text-gray-700 dark:text-gray-300">
-                Funds:
+                Mobile:
               </label>
               <input
-                type="number"
-                name="funds"
-                value={formData.funds}
+                type="text"
+                name="mobile"
+                value={formData.mobile}
                 onChange={handleChange}
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                  formErrors.funds
+                  formErrors.mobile
                     ? "border-red-500 focus:ring-red-400"
                     : "focus:ring-blue-400"
                 }`}
               />
-              {formErrors.funds && (
+              {formErrors.mobile && (
                 <div className="text-red-500 text-sm mt-1">
-                  {formErrors.funds}
+                  {formErrors.mobile}
                 </div>
               )}
             </div>

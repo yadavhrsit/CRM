@@ -6,6 +6,7 @@ const {
   getUserById,
   getProfile,
   getDashboard,
+  getAdminDashboard,
   updateProfile,
   updateUser,
   deleteUser,
@@ -17,6 +18,7 @@ const roleMiddleware = require("../middlewares/roleMiddleware");
 // Route to create a new user
 router.post(
   "/",
+  verifyToken,
   [
     check("username", "Username is required").notEmpty(),
     check("password", "Password is required").notEmpty(),
@@ -26,8 +28,6 @@ router.post(
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-
-      req.body.password = await hashPassword(req.body.password);
       next();
     },
   ],
@@ -44,14 +44,17 @@ router.get("/profile", verifyToken, getProfile);
 // Route to get logged in user dashboard
 router.get("/dashboard", verifyToken, getDashboard);
 
+// Route to get logged in Admin dashboard
+router.get("/admin/dashboard", verifyToken, getAdminDashboard);
+
 // Route to get user by ID
 router.get("/:id", verifyToken, getUserById);
 
 // Route to update logged in user
-router.put("/profile", verifyToken, updateProfile);
+router.patch("/profile", verifyToken, updateProfile);
 
 // Route to update user
-router.put("/:id", verifyToken, roleMiddleware(["admin"]), updateUser);
+router.patch("/:id", verifyToken, roleMiddleware(["admin"]), updateUser);
 
 // Route to delete user
 router.delete("/:id", verifyToken, roleMiddleware(["admin"]), deleteUser);

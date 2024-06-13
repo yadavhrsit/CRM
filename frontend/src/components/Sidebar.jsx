@@ -9,6 +9,10 @@ import {
   MdOutlineLogout,
   MdOutlineSettings,
 } from "react-icons/md";
+import { MdDashboard } from "react-icons/md";
+import { FaUsersCog } from "react-icons/fa";
+import { SiGoogleads } from "react-icons/si";
+import { RiChatFollowUpFill } from "react-icons/ri";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import { SidebarContext } from "../context/SidebarContext";
@@ -18,7 +22,7 @@ const Sidebar = () => {
   const { theme } = useContext(ThemeContext);
   const { isSidebarOpen, closeSidebar } = useContext(SidebarContext);
   const navbarRef = useRef(null);
-  const { logout } = useAuth(); // Destructure logout function from useAuth hook
+  const { logout,user } = useAuth(); // Destructure logout function from useAuth hook
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -77,7 +81,7 @@ const Sidebar = () => {
                 }`}
               >
                 <span className="menu-link-icon">
-                  <MdOutlineGridView size={18} />
+                  <MdDashboard size={24} />
                 </span>
                 <span className="menu-link-text">Dashboard</span>
               </Link>
@@ -90,7 +94,7 @@ const Sidebar = () => {
                 }`}
               >
                 <span className="menu-link-icon">
-                  <MdOutlineGridView size={18} />
+                  <SiGoogleads size={24} />
                 </span>
                 <span className="menu-link-text">Leads</span>
               </Link>
@@ -103,11 +107,26 @@ const Sidebar = () => {
                 }`}
               >
                 <span className="menu-link-icon">
-                  <MdOutlineGridView size={18} />
+                  <RiChatFollowUpFill size={24} />
                 </span>
                 <span className="menu-link-text">Follow Ups</span>
               </Link>
             </li>
+            {user.role === "admin" && (
+              <li className="menu-item my-1">
+                <Link
+                  to="/users"
+                  className={`menu-link ${
+                    location.pathname.includes("users") && "active"
+                  }`}
+                >
+                  <span className="menu-link-icon">
+                    <FaUsersCog size={24} />
+                  </span>
+                  <span className="menu-link-text">Users</span>
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
 

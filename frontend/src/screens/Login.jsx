@@ -40,6 +40,7 @@ function Login() {
       setLoading(false);
 
       if (response.ok) {
+        console.log(data);
         login(data.token, data.user); 
         setSuccess("Sign In successful.");
         setTimeout(() => {

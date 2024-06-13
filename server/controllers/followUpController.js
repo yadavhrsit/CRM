@@ -1,14 +1,23 @@
 const FollowUp = require("../models/FollowUp");
 const Lead = require("../models/Lead");
+const User = require("../models/User");
 
 // create a new follow-up
 const createFollowUp = async (req, res, next) => {
   try {
-    const lead = await Lead.findById(req.params.id);
+    // Check if the lead exists
+    const lead = await Lead.findById(req.params.id).populate({
+      path: "followUps",
+      populate: [
+        { path: "addedBy", model: "User", select: "name" },
+        { path: "assignedTo", model: "User", select: "name" },
+      ],
+    });
     if (!lead) {
       return res.status(404).json({ message: "Lead not found" });
     }
 
+    // Check if the lead is open
     if (lead.status !== "open") {
       return res.status(400).json({
         message: `Cannot create follow-up for a lead with status ${lead.status}`,
@@ -17,18 +26,35 @@ const createFollowUp = async (req, res, next) => {
 
     // Check if the assigned user is enabled
     const assignedUser = await User.findById(req.body.assignedTo);
-    if (!assignedUser || !assignedUser.enabled) {
+    if (!assignedUser || !assignedUser.status === "enabled") {
       return res.status(400).json({ message: "This user has been disabled." });
     }
 
-    const followUp = await FollowUp.create({
-      lead: req.params.id,
-      ...req.body,
-    });
+    // Check if the user is assigned to the lead or its the first follow-up
+    if (
+      lead.followUps.length === 0 ||
+      lead.followUps[lead.followUps.length - 1].assignedTo._id.toString() ===
+        req.user.userId
+    ) {
+      const followUp = await FollowUp.create({
+        lead: req.params.id,
+        addedBy: req.user.userId,
+        ...req.body,
+      });
 
-    lead.followUps.push(followUp._id);
-    await lead.save();
-    res.status(201).json(followUp);
+      lead.followUps.push(followUp._id);
+      await lead.save();
+      if (req.body.leadStatus) {
+        lead.status = req.body.leadStatus;
+        await lead.save();
+        console.log(lead);
+      }
+      res.status(201).json(followUp);
+    } else {
+      return res
+        .status(400)
+        .json({ message: "You are not assigned to follow-Up for this lead." });
+    }
   } catch (error) {
     next(error);
   }
@@ -37,9 +63,15 @@ const createFollowUp = async (req, res, next) => {
 // Get all follow-ups
 const getFollowUps = async (req, res, next) => {
   try {
-    const { search, sortBy, sortOrder } = req.query;
+    const {
+      search,
+      sortBy = "followDate",
+      sortOrder = "desc",
+      page = 1,
+      limit = 10,
+    } = req.query;
 
-    // Add search condition
+    let query = {};
     if (search) {
       query = {
         ...query,
@@ -50,14 +82,91 @@ const getFollowUps = async (req, res, next) => {
       };
     }
 
-    // Add sort condition
     let sort = {};
-    if (sortBy) {
-      sort[sortBy] = sortOrder === "desc" ? -1 : 1;
+    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
+
+    const skip = (page - 1) * limit;
+
+    const followUps = await FollowUp.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate("addedBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate({
+        path: "lead",
+        populate: {
+          path: "company",
+          model: "Company",
+          select: "name",
+        },
+      });
+
+    const total = await FollowUp.countDocuments(query);
+
+    res.json({
+      followUps,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// Get all follow-ups of logged in user
+const getFollowUpsByUser = async (req, res, next) => {
+  try {
+    const {
+      search,
+      sortBy = "createdAt",
+      sortOrder = "desc",
+      page = 1,
+      limit = 10,
+    } = req.query;
+
+    let query = {
+      assignedTo: req.user.userId,
+    };
+    if (search) {
+      query = {
+        ...query,
+        $or: [
+          { followDate: { $regex: search, $options: "i" } },
+          { remarks: { $regex: search, $options: "i" } },
+        ],
+      };
     }
 
-    const followUps = await FollowUp.find(query).sort(sort);
-    res.json(followUps);
+    let sort = {};
+    sort[sortBy] = sortOrder === "desc" ? -1 : 1;
+
+    const skip = (page - 1) * limit;
+
+    const followUps = await FollowUp.find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate("addedBy", "name email")
+      .populate("assignedTo", "name email")
+      .populate({
+        path: "lead",
+        populate: {
+          path: "company",
+          model: "Company",
+          select: "name",
+        },
+      });
+
+    const total = await FollowUp.countDocuments(query);
+
+    res.json({
+      followUps,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / limit),
+    });
   } catch (error) {
     next(error);
   }
@@ -200,6 +309,7 @@ const deleteFollowUp = async (req, res, next) => {
 module.exports = {
   createFollowUp,
   getFollowUps,
+  getFollowUpsByUser,
   getFollowUpsByLeadId,
   getFollowUpsByAssignedUser,
   getFollowUpsByAddedUser,

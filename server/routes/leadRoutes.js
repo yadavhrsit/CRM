@@ -6,11 +6,14 @@ const {
   getLeads,
   getLeadById,
   getLeadsByAddedUser,
+  getLeadsByCompany,
   updateLead,
   deleteLead,
+  getLeadsByUser,
 } = require("../controllers/leadController");
 const verifyToken = require("../middlewares/authMiddleware");
 const roleMiddleware = require("../middlewares/roleMiddleware");
+const errorHandler = require("../middlewares/errorHandler");
 
 // Validation middleware for creating or updating a lead
 const validateLead = [
@@ -29,16 +32,24 @@ const validateLead = [
 ];
 
 // Route to create a new lead
-router.post("/", verifyToken, validateLead, createLead);
+router.post("/", verifyToken, validateLead, createLead, errorHandler);
 
 // Route to get all leads
-router.get("/", verifyToken, getLeads);
+router.get("/", verifyToken, getLeads, errorHandler);
+
+// Route to get all leads of logged in user
+router.get("/my-leads", verifyToken, getLeadsByUser, errorHandler);
 
 // Route to get lead by ID
-router.get("/:id", verifyToken, getLeadById);
+router.get("/:id", verifyToken, getLeadById, errorHandler);
 
 // Route to get leads by added user ID
-router.get("/added-by-user/:id", verifyToken, getLeadsByAddedUser);
+router.get(
+  "/added-by-user/:id",
+  verifyToken,
+  getLeadsByAddedUser,
+  errorHandler
+);
 
 // Route to update lead
 router.put(
@@ -48,6 +59,9 @@ router.put(
   roleMiddleware(["admin"]),
   updateLead
 );
+
+// Route to get all leads by company id
+router.get("/company/:companyId", verifyToken, getLeadsByCompany, errorHandler);
 
 // Route to delete lead
 router.delete("/:id", verifyToken, roleMiddleware(["admin"]), deleteLead);

@@ -50,8 +50,8 @@
 
 @mixin darkMode {
   --primary-color: #3b82f6;
-  --secondary-color: #2e2e48;
-  --background-color: #383854;
+  --secondary-color: #0b132b;
+  --background-color: #111d40;
   --side-link-hover-color: #525270;
   --side-text-color: #e1e1e1;
   --logo-color: #fff;
@@ -64,9 +64,9 @@
   --toggle-btn-border-color: #525270;
   --toggle-btn-bg-color: #525270;
   --toggle-btn-icon-color: #bdbdbd;
-  --thead-bg-color: #383854;
-  --tbl-border-color: ##383854;
-  --scroll-track-bg-color: #2e2e48;
+  --thead-bg-color: #111d40;
+  --tbl-border-color: ##111d40;
+  --scroll-track-bg-color: #0b132b;
   --scroll-thumb-bg-color: #575777;
 }
 

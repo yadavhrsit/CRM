@@ -7,18 +7,18 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("crm_token"));
-  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [user, setUser] = useState(localStorage.getItem("user"));
 
   const login = (token, user) => {
     localStorage.setItem("crm_token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    localStorage.setItem("user", user);
     setToken(token);
     setUser(user);
+    console.log(token, user);
   };
 
   const logout = () => {
     localStorage.removeItem("crm_token");
-    localStorage.removeItem("user");
     setToken(null);
     setUser(null);
   };
@@ -28,7 +28,7 @@ export const AuthProvider = ({ children }) => {
       axios
         .get(`${BASE_URL}/users/profile`, {
           headers: {
-            Authorization: `${token}`, 
+            Authorization: `${token}`,
           },
         })
         .then((response) => {

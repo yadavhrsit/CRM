@@ -9,6 +9,7 @@ const {
   getFollowUpById,
   updateFollowUp,
   deleteFollowUp,
+  getFollowUpsByUser,
 } = require("../controllers/followUpController");
 const verifyToken = require("../middlewares/authMiddleware");
 const roleMiddleware = require("../middlewares/roleMiddleware");
@@ -18,6 +19,9 @@ router.post("/:id", verifyToken, createFollowUp);
 
 // Route to get all follow-ups
 router.get("/", verifyToken, getFollowUps);
+
+// Route to get all follow-ups of logged in user
+router.get("/my-follow-ups", verifyToken, getFollowUpsByUser);
 
 // Route to get follow-up by Lead ID
 router.get("/lead/:id", verifyToken, getFollowUpsByLeadId);
