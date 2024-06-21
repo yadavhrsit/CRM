@@ -112,7 +112,7 @@ const Sidebar = () => {
                 <span className="menu-link-text">Follow Ups</span>
               </Link>
             </li>
-            {user.role === "admin" && (
+            {user?.role === "admin" && (
               <li className="menu-item my-1">
                 <Link
                   to="/users"
