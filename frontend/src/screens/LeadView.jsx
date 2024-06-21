@@ -205,7 +205,16 @@ function LeadView() {
                   </label>
                   <p className="text-lg text-gray-900 dark:text-gray-100">
                     {followUp.followDate &&
-                      dayjs(followUp.followDate).format("DD-MM-YYYY, HH:mm A")}
+                      dayjs(followUp.followDate).format("DD-MM-YYYY")}
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-gray-700 dark:text-gray-300">
+                    Follow up taken Date:
+                  </label>
+                  <p className="text-lg text-gray-900 dark:text-gray-100">
+                    {followUp.createdAt &&
+                      dayjs(followUp.createdAt).format("DD-MM-YYYY, hh:mm A")}
                   </p>
                 </div>
                 <div>
