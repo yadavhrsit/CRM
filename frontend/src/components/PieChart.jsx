@@ -55,8 +55,8 @@ const CustomPieChart = ({ pieData, infoData }) => {
               >
                 {pieData[index].name}: {value} (
                 {(
-                  (value / infoData.totalLeads || value / infoData.closedLeadsCount) *
-                  100
+                  (value / infoData.totalLeads ||
+                    value / infoData.closedLeadsCount) * 100
                 ).toFixed(0)}
                 %)
               </text>

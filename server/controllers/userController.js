@@ -147,10 +147,11 @@ const getDashboard = async (req, res, next) => {
       },
     });
 
-    // Count won, lost, and closed leads
+    // Count won, lost, and closed open leads
     const wonLeadsCount = await Lead.countDocuments({ status: "won" });
     const lostLeadsCount = await Lead.countDocuments({ status: "lost" });
     const closedLeadsCount = wonLeadsCount + lostLeadsCount;
+    const openLeadsCount = totalLeads - closedLeadsCount;
 
     // Count upcoming follow-ups and today's follow-ups for the user
     const allUserFollowUps = await FollowUp.find({ assignedTo: userId });
@@ -178,6 +179,8 @@ const getDashboard = async (req, res, next) => {
       status: { $in: ["won", "lost"] },
     });
 
+    const userOpenLeads = userTotalLeads - userClosedLeads;
+
     const userWonLeadsCount = await Lead.countDocuments({
       addedBy: userId,
       status: "won",
@@ -188,6 +191,7 @@ const getDashboard = async (req, res, next) => {
       status: "lost",
     });
 
+
     res.json({
       totalLeads,
       userTotalLeads,
@@ -196,9 +200,11 @@ const getDashboard = async (req, res, next) => {
       wonLeadsCount,
       lostLeadsCount,
       closedLeadsCount,
+      openLeadsCount,
       upcomingFollowUpsCount,
       todayFollowUpsCount,
       userClosedLeads,
+      userOpenLeads,
       userWonLeadsCount,
       userLostLeadsCount,
     });
@@ -228,7 +234,7 @@ const getAdminDashboard = async (req, res, next) => {
       },
     });
 
-    // Count won, lost, and closed leads
+    // Count won, lost, and closed,open leads
     const wonLeadsCount = await Lead.countDocuments({ status: "won" });
     const lostLeadsCount = await Lead.countDocuments({ status: "lost" });
     const closedLeadsCount = wonLeadsCount + lostLeadsCount;

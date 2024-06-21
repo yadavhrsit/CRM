@@ -36,8 +36,8 @@ function EmployeeDashboard() {
         setDashboardData(response.data);
         setLeadChartData([
           {
-            name: "Closed Leads",
-            value: response.data.closedLeadsCount || 0,
+            name: "Open Leads",
+            value: response.data.openLeadsCount || 0,
             color: "#4caf50",
           },
           {
@@ -61,8 +61,8 @@ function EmployeeDashboard() {
 
         setUserLeadsChartData([
           {
-            name: "Closed Leads",
-            value: response.data.userClosedLeads || 0,
+            name: "Open Leads",
+            value: response.data.userOpenLeads || 0,
             color: "#4caf50",
           },
           {
