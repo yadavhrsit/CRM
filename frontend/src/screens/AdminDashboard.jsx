@@ -10,8 +10,10 @@ import AreaTop from "../components/AreaTop";
 import DataCard from "../components/DataCard";
 import { MdPerson, MdAddCircle } from "react-icons/md";
 import CustomPieChart from "../components/PieChart";
+import { useNotification } from "../context/NotificationContext";
 
 function AdminDashboard() {
+  const { notifications } = useNotification();
   const navigate = useNavigate();
   const { token } = useAuth();
   const [companies, setCompanies] = useState([]);
@@ -88,7 +90,7 @@ function AdminDashboard() {
     } else {
       fetchCompanies();
     }
-  }, [token, navigate]);
+  }, [token, navigate, notifications]);
 
   const fetchCompanies = async () => {
     try {
@@ -136,7 +138,7 @@ function AdminDashboard() {
     if (selectedCompany) {
       fetchLeads();
     }
-  }, [selectedCompany, page]);
+  }, [selectedCompany, page, notifications]);
 
   const columns = [
     { Header: "Company", accessor: "company.name" },

@@ -27,7 +27,7 @@
 
 @keyframes flash {
   0% {
-    background-color: greenyellow;
+    background-color: #3b82f6;
   }
   100% {
     background-color: inherit;

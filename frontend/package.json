@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.45.1",
     "aos": "^2.3.4",
     "axios": "^1.7.1",
     "date-fns": "^3.1.0",
@@ -29,7 +28,6 @@
     "sweetalert2": "^11.11.0"
   },
   "devDependencies": {
-    "@tanstack/eslint-plugin-query": "^5.43.1",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",

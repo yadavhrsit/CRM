@@ -7,9 +7,12 @@ import AreaTop from "../components/AreaTop";
 import { useParams, useLocation } from "react-router-dom";
 import AddFollowUpForm from "../components/AddFollowUpForm";
 import Modal from "../components/Modal";
+import { useNotification } from "../context/NotificationContext";
 
 function LeadView() {
   const { token, user } = useAuth();
+
+  const { notifications } = useNotification();
   
   const { id } = useParams();
   const location = useLocation();
@@ -34,7 +37,7 @@ function LeadView() {
       }
     }
     fetchData();
-  }, [id, token]);
+  }, [id, token, notifications]);
 
   const handlePrint = () => {
     const printContent = printRef.current.innerHTML;

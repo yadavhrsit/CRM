@@ -7,10 +7,13 @@ import axios from "axios";
 import AreaTop from "../components/AreaTop";
 import DataTable from "../components/DataTable";
 import { useNavigate } from "react-router-dom";
+import { useNotification } from "../context/NotificationContext";
 
 function FollowUps() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
+
+  const { notifications } = useNotification();
 
   const [followUps, setFollowUps] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,7 +52,7 @@ function FollowUps() {
       }
     }
     fetchData();
-  }, [token, page]); // Fetch data when token or page changes
+  }, [token, page, notifications,user]); // Fetch data when token or page changes
 
   const columns = [
     { Header: "Company", accessor: "lead.company.name" },

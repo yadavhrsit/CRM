@@ -1,3 +1,4 @@
+// AreaTop.js
 import { MdOutlineMenu } from "react-icons/md";
 import { MdNotifications } from "react-icons/md";
 import { useContext, useState, useEffect } from "react";
@@ -8,6 +9,7 @@ import Modal from "./Modal";
 import io from "socket.io-client";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useNotification } from "../context/NotificationContext";
 
 const socket = io("http://localhost:5000", {
   withCredentials: true,
@@ -15,10 +17,11 @@ const socket = io("http://localhost:5000", {
 
 const AreaTop = ({ title, showAddLeadBtn }) => {
   const navigate = useNavigate();
-
   const { openSidebar } = useContext(SidebarContext);
   const { theme } = useContext(ThemeContext);
   const { user } = useAuth();
+
+  const { addNotification } = useNotification(); // Use addNotification from the NotificationContext
 
   const [showAddLeadModal, setShowAddLeadModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -45,13 +48,14 @@ const AreaTop = ({ title, showAddLeadBtn }) => {
           newNotification,
           ...prevNotifications,
         ]);
+        addNotification(newNotification); // Add new notification to the context
       }
     });
 
     return () => {
       socket.off("notification");
     };
-  }, []);
+  }, [user, addNotification]);
 
   useEffect(() => {
     const interval = setInterval(() => {

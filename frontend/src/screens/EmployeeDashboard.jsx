@@ -10,7 +10,10 @@ import DataCard from "../components/DataCard";
 import { MdPerson, MdEvent, MdAddCircle, MdAlarm } from "react-icons/md";
 import CustomPieChart from "../components/PieChart";
 
+import { useNotification } from "../context/NotificationContext";
+
 function EmployeeDashboard() {
+  const { notifications } = useNotification();
   const navigate = useNavigate();
   const { token, user } = useAuth();
   if (!token) {
@@ -84,13 +87,12 @@ function EmployeeDashboard() {
           openLeadsCount:
             response.data.userTotalLeads - response.data.userClosedLeads,
         });
-
       } catch (error) {
         console.error(error);
       }
     }
     fetchData();
-  }, [token,user.name]);
+  }, [token, user.name, notifications]);
 
   return (
     <div>
