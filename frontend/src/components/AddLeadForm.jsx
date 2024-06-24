@@ -94,6 +94,7 @@ function AddLeadForm() {
           mobile: "",
           query: "",
         });
+        
       })
       .catch((err) => {
         swal.fire({

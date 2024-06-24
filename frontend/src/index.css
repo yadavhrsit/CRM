@@ -23,3 +23,17 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #a8bbbf;
 }
+
+
+@keyframes flash {
+  0% {
+    background-color: greenyellow;
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+
+.animate-flash {
+  animation: flash 0.5s;
+}

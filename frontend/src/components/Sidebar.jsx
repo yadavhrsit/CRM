@@ -5,7 +5,6 @@ import lightLogo from "../assets/images/logo_blue.svg";
 import darkLogo from "../assets/images/logo_white.svg";
 import {
   MdOutlineClose,
-  MdOutlineGridView,
   MdOutlineLogout,
   MdOutlineSettings,
 } from "react-icons/md";

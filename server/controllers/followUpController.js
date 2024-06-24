@@ -1,6 +1,7 @@
 const FollowUp = require("../models/FollowUp");
 const Lead = require("../models/Lead");
 const User = require("../models/User");
+const {notificationsHandler} = require("../utils/notificationsHandler");
 
 // create a new follow-up
 const createFollowUp = async (req, res, next) => {
@@ -44,10 +45,23 @@ const createFollowUp = async (req, res, next) => {
 
       lead.followUps.push(followUp._id);
       await lead.save();
+
       if (req.body.leadStatus) {
         lead.status = req.body.leadStatus;
         await lead.save();
-        console.log(lead);
+        if (req.body.leadStatus === "won" || "lost") {
+          const type = "leads";
+          const id = lead._id;
+          const user = req.user.username;
+          const message = `${req.user.name} just ${req.body.leadStatus} a ${type}.`;
+          notificationsHandler(type, id, message, user, notifyEveryone=false);
+        }
+      } else {
+        const type = "leads";
+        const id = lead._id;
+        const user = assignedUser.username;
+        const message = `${req.user.name} just assigned a ${type} to ${assignedUser.name}.`;
+        notificationsHandler(type, id, message, user,notifyEveryone=false);
       }
       res.status(201).json(followUp);
     } else {

@@ -21,19 +21,28 @@ const login = async (req, res, next) => {
     }
 
     if (user.status !== "enabled") {
-      return res.status(401).json({ message: "Your account has been disabled. Please contact Admin" });
+      return res.status(401).json({
+        message: "Your account has been disabled. Please contact Admin",
+      });
     }
-    console.log(password);
-    console.log(user);
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
       return res.status(401).json({ message: "Invalid Password" });
     }
 
-    const token = jwt.sign({ userId: user._id, role: user.role }, jwtSecret, {
-      expiresIn: "30d",
-    });
-    res.json({ token,user });
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        username: user.username,
+        name: user.name,
+        role: user.role,
+      },
+      jwtSecret,
+      {
+        expiresIn: "30d",
+      }
+    );
+    res.json({ token, user });
   } catch (error) {
     next(error);
   }

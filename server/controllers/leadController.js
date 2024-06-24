@@ -1,7 +1,7 @@
 // controllers/leadController.js
 const Lead = require("../models/Lead");
 const Company = require("../models/Company");
-
+const {notificationsHandler} = require("../utils/notificationsHandler");
 // Create a new lead
 const createLead = async (req, res, next) => {
   try {
@@ -14,6 +14,11 @@ const createLead = async (req, res, next) => {
       addedBy: req.user.userId,
       company: company._id,
     });
+    const type = "leads";
+    const id = lead._id;
+    const user = req.user.username;
+    const message = `${req.user.name} just added a ${type}.`;
+    notificationsHandler(type, id, message, user,notifyEveryone=true);
     res.status(201).json(lead);
   } catch (error) {
     next(error);

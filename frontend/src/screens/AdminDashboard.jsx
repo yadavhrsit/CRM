@@ -8,7 +8,7 @@ import axios from "axios";
 import dayjs from "dayjs";
 import AreaTop from "../components/AreaTop";
 import DataCard from "../components/DataCard";
-import { MdPerson, MdEvent, MdAddCircle, MdAlarm } from "react-icons/md";
+import { MdPerson, MdAddCircle } from "react-icons/md";
 import CustomPieChart from "../components/PieChart";
 
 function AdminDashboard() {

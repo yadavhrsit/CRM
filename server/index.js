@@ -1,4 +1,5 @@
 const express = require("express");
+const { createServer } = require("http");
 const cors = require("cors");
 const morgan = require("morgan");
 const errorHandler = require("./middlewares/errorHandler");
@@ -12,13 +13,20 @@ const leadRoutes = require("./routes/leadRoutes");
 const companyRoutes = require("./routes/companyRoutes");
 const followUpRoutes = require("./routes/followUpRoutes");
 
+// Import notifications handler
+const { initSocket } = require("./utils/notificationsHandler");
+
 // Create Express app
 const app = express();
-app.use(express.json());
+const httpServer = createServer(app);
+
+// Initialize Socket.IO
+initSocket(httpServer);
 
 // Middleware
 app.use(cors());
 app.use(morgan("dev"));
+app.use(express.json());
 
 // Connect to MongoDB
 connectDB();
@@ -30,9 +38,11 @@ app.use("/api/leads", leadRoutes);
 app.use("/api/companies", companyRoutes);
 app.use("/api/follow-ups", followUpRoutes);
 
+// Error handler middleware
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+const port = PORT || 5000;
+httpServer.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 });

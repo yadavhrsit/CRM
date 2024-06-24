@@ -102,8 +102,8 @@ function LeadView() {
             Print
           </button>
           {(addFollowUp ||
-            lead?.followUps[lead.followUps.length - 1]?.assignedTo._id ===
-              user._id) && (
+            lead?.followUps[lead.followUps.length - 1]?.assignedTo.username ===
+              user.username) && (
             <button
               onClick={handleFollowUp}
               className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
