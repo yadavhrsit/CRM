@@ -164,8 +164,8 @@ const getLeadById = async (req, res, next) => {
       .populate({
         path: "followUps",
         populate: [
-          { path: "addedBy", model: "User", select: "name username" },
-          { path: "assignedTo", model: "User", select: "name" },
+          { path: "addedBy", model: "User", select: "name" },
+          { path: "assignedTo", model: "User", select: "name username" },
         ],
       });
     if (!lead) {
