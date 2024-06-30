@@ -304,7 +304,7 @@ const updateProfile = async (req, res, next) => {
     user.username = username || user.username;
     user.mobile = mobile || user.mobile;
     user.email = email || user.email;
-    user.password = password || user.password;
+    user.password = password!== "" && (password || user.password);
 
     await user.save();
     res.json({ message: "Profile updated successfully" });
