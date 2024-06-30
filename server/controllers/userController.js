@@ -191,7 +191,6 @@ const getDashboard = async (req, res, next) => {
       status: "lost",
     });
 
-
     res.json({
       totalLeads,
       userTotalLeads,
@@ -304,7 +303,9 @@ const updateProfile = async (req, res, next) => {
     user.username = username || user.username;
     user.mobile = mobile || user.mobile;
     user.email = email || user.email;
-    user.password = password!== "" && (password || user.password);
+    if (password) {
+      user.password = password;
+    }
 
     await user.save();
     res.json({ message: "Profile updated successfully" });
