@@ -3,15 +3,17 @@ import {
   View,
   Text,
   TextInput,
-  Button,
   ActivityIndicator,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "../constants/api";
 import { useAuth } from "../context/AuthContext";
+import { useColorScheme } from "nativewind";
 
 function Settings() {
+  const { colorScheme } = useColorScheme();
   const { token } = useAuth();
   const [user, setUser] = useState({});
   const [initialUser, setInitialUser] = useState({});
@@ -22,7 +24,6 @@ function Settings() {
     name: "",
     mobile: "",
     email: "",
-    funds: 0,
     password: "",
   });
   const [formErrors, setFormErrors] = useState({});
@@ -45,7 +46,6 @@ function Settings() {
           name: userData.name,
           mobile: userData.mobile,
           email: userData.email,
-          funds: userData.funds,
           password: "",
         });
         setLoading(false);
@@ -136,13 +136,14 @@ function Settings() {
   if (loading)
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#2763ad" />
         <Text>Loading...</Text>
       </View>
     );
 
   return (
     <View
+      className="bg-white dark:bg-black"
       style={{
         flex: 1,
         justifyContent: "center",
@@ -151,8 +152,8 @@ function Settings() {
       }}
     >
       <View
+        className="bg-gray-100 dark:bg-zinc-700"
         style={{
-          backgroundColor: "#ffffff",
           borderRadius: 8,
           padding: 16,
           width: "90%",
@@ -160,12 +161,12 @@ function Settings() {
         }}
       >
         <Text
+          className="dark:text-white"
           style={{
             fontSize: 20,
             fontWeight: "bold",
             marginBottom: 12,
             textAlign: "center",
-            color: "#333333",
           }}
         >
           User Details
@@ -197,7 +198,7 @@ function Settings() {
           </View>
         )}
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ color: "#374151" }}>Username:</Text>
+          <Text className="dark:text-white">Username:</Text>
           <TextInput
             value={formData.username}
             onChangeText={(text) => handleChange("username", text)}
@@ -207,15 +208,17 @@ function Settings() {
               borderRadius: 8,
               paddingHorizontal: 12,
               paddingVertical: 8,
+              backgroundColor: "lightgray",
             }}
             editable={false}
           />
         </View>
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ color: "#374151" }}>Name:</Text>
+          <Text className="dark:text-white">Name:</Text>
           <TextInput
             value={formData.name}
             onChangeText={(text) => handleChange("name", text)}
+            className="dark:text-white"
             style={[
               {
                 borderWidth: 1,
@@ -234,10 +237,11 @@ function Settings() {
           )}
         </View>
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ color: "#374151" }}>Email:</Text>
+          <Text className="dark:text-white">Email:</Text>
           <TextInput
             value={formData.email}
             onChangeText={(text) => handleChange("email", text)}
+            className="dark:text-white"
             style={[
               {
                 borderWidth: 1,
@@ -256,9 +260,10 @@ function Settings() {
           )}
         </View>
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ color: "#374151" }}>Mobile:</Text>
+          <Text className="dark:text-white">Mobile:</Text>
           <TextInput
             value={formData.mobile}
+            className="dark:text-white"
             onChangeText={(text) => handleChange("mobile", text)}
             style={[
               {
@@ -278,11 +283,14 @@ function Settings() {
           )}
         </View>
         <View style={{ marginBottom: 12 }}>
-          <Text style={{ color: "#374151" }}>Password:</Text>
+          <Text className="dark:text-white">Password:</Text>
           <TextInput
+            className="dark:text-white"
             value={formData.password}
             onChangeText={(text) => handleChange("password", text)}
             secureTextEntry
+            placeholder="Enter new password"
+            placeholderTextColor={colorScheme === "dark" ? "white" : "black"}
             style={[
               {
                 borderWidth: 1,
@@ -301,11 +309,13 @@ function Settings() {
           )}
         </View>
         <View style={{ flexDirection: "row", justifyContent: "center" }}>
-          <Button
-            title="Update Details"
+          <TouchableOpacity
             onPress={handleSubmit}
             color="#1e40af"
-          />
+            className="flex flex-row justify-center items-center bg-[#2763ad] px-4 py-2 rounded-md mb-1"
+          >
+            <Text className="text-white">Update Details</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </View>

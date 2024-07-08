@@ -70,10 +70,19 @@ const CustomPieChart = ({ pieData, infoData }) => {
 
         <Legend
           formatter={(value, entry) => {
-            return `${entry.payload.name}: ${entry.payload.value} (${(
-              (entry.payload.value / infoData.totalLeads ||
-                entry.payload.value / infoData.closedLeadsCount) * 100
-            ).toFixed(0)}%)`;
+            return `${entry.payload.name}: ${entry.payload.value}  (${
+              isNaN(
+                (
+                  (entry.payload.value / infoData.totalLeads ||
+                    entry.payload.value / infoData.closedLeadsCount) * 100
+                ).toFixed(0)
+              )
+                ? 0
+                : (
+                    (entry.payload.value / infoData.totalLeads ||
+                      entry.payload.value / infoData.closedLeadsCount) * 100
+                  ).toFixed(0)
+            }%)`;
           }}
           align="center"
           verticalAlign="bottom"

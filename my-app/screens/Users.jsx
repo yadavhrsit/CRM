@@ -8,31 +8,32 @@ import {
   ActivityIndicator,
   Button,
 } from "react-native";
+import dayjs from "dayjs";
 import { useAuth } from "../context/AuthContext";
 import { useNotification } from "../context/NotificationContext";
-import dayjs from "dayjs";
 import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import AddUserForm from "../components/AddUserForm";
 
-function Leads() {
+function Users() {
   const { token } = useAuth();
   const { notifications } = useNotification();
   const navigation = useNavigation();
 
-  const [leads, setLeads] = useState([]);
+  const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [page, setPage] = useState(1); // Current page
-  const [totalPages, setTotalPages] = useState(0); // Total pages
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get(`${BASE_URL}/leads/`, {
+        const response = await axios.get(`${BASE_URL}/users/`, {
           headers: { Authorization: token },
-          params: { page },
+          params: { page, limit: 10 },
         });
-        setLeads(response.data.docs);
+        setUsers(response.data.users);
         setTotalPages(response.data.totalPages); // Set total pages
       } catch (error) {
         Alert.alert(
@@ -44,16 +45,37 @@ function Leads() {
       }
     }
     fetchData();
-  }, [token, page, notifications]); // Fetch data when token or page changes
+  }, [token, page, notifications]);
 
-  const handleRowClick = (lead) => {
-    navigation.navigate("Lead Details", {
-      id: lead._id,
-      addFollowUp:
-        lead.followUps.length === 0 ,
+  const handleRowClick = (user) => {
+    navigation.navigate("User Details", {
+      id: user._id,
     });
   };
 
+  const handleEnableDisableUser = async (userId, currentStatus) => {
+    const newStatus = currentStatus === "enabled" ? "disabled" : "enabled";
+    try {
+      await axios.patch(
+        `${BASE_URL}/users/${userId}`,
+        { status: newStatus },
+        {
+          headers: { Authorization: token },
+        }
+      );
+      // Update the users list after successful update
+      const updatedUsers = users.map((user) =>
+        user._id === userId ? { ...user, status: newStatus } : user
+      );
+      setUsers(updatedUsers);
+      Alert.alert("Success", `User status changed to ${newStatus}`);
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        error.response?.data?.message || "Failed to update user status"
+      );
+    }
+  };
 
   const renderTableHeader = () => (
     <View className="flex-row bg-blue-100 dark:bg-gray-600 p-2">
@@ -61,13 +83,7 @@ function Leads() {
         className="flex-1 text-center font-bold dark:text-white"
         style={{ width: 100 }}
       >
-        Company
-      </Text>
-      <Text
-        className="flex-1 text-center font-bold dark:text-white"
-        style={{ width: 100 }}
-      >
-        Name
+        Username
       </Text>
       <Text
         className="flex-1 text-center font-bold dark:text-white"
@@ -79,36 +95,30 @@ function Leads() {
         className="flex-1 text-center font-bold dark:text-white"
         style={{ width: 100 }}
       >
-        Mobile
+        Role
       </Text>
       <Text
         className="flex-1 text-center font-bold dark:text-white"
         style={{ width: 150 }}
       >
-        Query
+        Created At
       </Text>
       <Text
         className="flex-1 text-center font-bold dark:text-white"
-        style={{ width: 100 }}
+        style={{ width: 150 }}
       >
         Status
       </Text>
       <Text
         className="flex-1 text-center font-bold dark:text-white"
-        style={{ width: 100 }}
-      >
-        Added By
-      </Text>
-      <Text
-        className="flex-1 text-center font-bold dark:text-white"
         style={{ width: 150 }}
       >
-        Added At
+        Actions
       </Text>
     </View>
   );
 
-  const renderTableRow = (lead, index) => (
+  const renderTableRow = (user, index) => (
     <TouchableOpacity
       key={index}
       className={`flex-row p-2 ${
@@ -116,7 +126,7 @@ function Leads() {
           ? "bg-white dark:bg-zinc-900"
           : "bg-gray-100 dark:bg-zinc-800"
       }`}
-      onPress={() => handleRowClick(lead)}
+      onPress={() => handleRowClick(user)}
     >
       <Text
         className="flex-1 text-center dark:text-white"
@@ -124,15 +134,7 @@ function Leads() {
         numberOfLines={1}
         ellipsizeMode="tail"
       >
-        {lead.company.name}
-      </Text>
-      <Text
-        className="flex-1 text-center dark:text-white"
-        style={{ width: 100 }}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {lead.name}
+        {user.username}
       </Text>
       <Text
         className="flex-1 text-center dark:text-white"
@@ -140,7 +142,7 @@ function Leads() {
         numberOfLines={1}
         ellipsizeMode="tail"
       >
-        {lead.email}
+        {user.email}
       </Text>
       <Text
         className="flex-1 text-center dark:text-white"
@@ -148,7 +150,7 @@ function Leads() {
         numberOfLines={1}
         ellipsizeMode="tail"
       >
-        {lead.mobile}
+        {user.role}
       </Text>
       <Text
         className="flex-1 text-center dark:text-white"
@@ -156,23 +158,7 @@ function Leads() {
         numberOfLines={1}
         ellipsizeMode="tail"
       >
-        {lead.query}
-      </Text>
-      <Text
-        className="flex-1 text-center dark:text-white"
-        style={{ width: 100 }}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {lead.status}
-      </Text>
-      <Text
-        className="flex-1 text-center dark:text-white"
-        style={{ width: 100 }}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {lead.addedBy.name}
+        {dayjs(user.createdAt).format("DD/MM/YYYY, hh:mm A")}
       </Text>
       <Text
         className="flex-1 text-center dark:text-white"
@@ -180,8 +166,23 @@ function Leads() {
         numberOfLines={1}
         ellipsizeMode="tail"
       >
-        {dayjs(lead.createdAt).format("DD/MM/YYYY, hh:mm A")}
+        {user.status}
       </Text>
+      <View
+        className="flex-1 flex-row justify-center items-center"
+        style={{ width: 150 }}
+      >
+        <Button
+          title={user.status === "enabled" ? "Disable" : "Enable"}
+          onPress={() => handleEnableDisableUser(user._id, user.status)}
+          color={user.status === "enabled" ? "red" : "green"}
+        />
+        <Button
+          title="Update"
+          onPress={() => handleRowClick(user)}
+          color="blue"
+        />
+      </View>
     </TouchableOpacity>
   );
 
@@ -192,7 +193,7 @@ function Leads() {
           <ActivityIndicator size="large" color="#2763ad" />
           <Text className="text-xl">Loading...</Text>
         </View>
-      ) : leads.length === 0 ? (
+      ) : users.length === 0 ? (
         <View className="flex-1 justify-center items-center">
           <Text className="text-xl">No data available to display</Text>
         </View>
@@ -202,7 +203,7 @@ function Leads() {
             <View>
               {renderTableHeader()}
               <ScrollView>
-                {leads.map((lead, index) => renderTableRow(lead, index))}
+                {users.map((user, index) => renderTableRow(user, index))}
               </ScrollView>
             </View>
           </ScrollView>
@@ -212,7 +213,7 @@ function Leads() {
               onPress={() => setPage((prev) => Math.max(prev - 1, 1))}
               disabled={page === 1}
             />
-            <Text className="text-black dark:text-white">
+            <Text className="dark:text-white">
               Page {page} of {totalPages}
             </Text>
             <Button
@@ -223,8 +224,9 @@ function Leads() {
           </View>
         </>
       )}
+      <AddUserForm />
     </View>
   );
 }
 
-export default Leads;
+export default Users;

@@ -1,8 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SplashScreen from "expo-splash-screen";
 import axios from "axios";
 import { BASE_URL } from "../constants/api";
-
+SplashScreen.preventAutoHideAsync();
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -20,6 +21,9 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error("Failed to load token and user from storage", error);
+      }
+      finally{
+        await SplashScreen.hideAsync();
       }
     };
 

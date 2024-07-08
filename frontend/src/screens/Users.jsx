@@ -113,6 +113,10 @@ function Users() {
     navigate(`/users/${userId}`);
   };
 
+  const handleRowClick = (row) => {
+    navigate(`/users/${row.original._id}`);
+  };
+
   const handleNextPage = () => {
     if (page < totalPages) {
       setPage(page + 1);
@@ -156,6 +160,7 @@ function Users() {
             canNextPage={page < totalPages} // Check if there is a next page
             nextPage={handleNextPage} // Pass the function to go to the next page
             previousPage={handlePreviousPage} // Pass the function to go to the previous page
+            handleRowClick={handleRowClick}
           />
           <div className="flex justify-between p-4">
             <button

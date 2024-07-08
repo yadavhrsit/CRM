@@ -23,7 +23,7 @@ function DataCard({ title, value }) {
   }, [value]);
 
   return (
-    <View className="basis-1/4 grow mx-2 h-full bg-white dark:bg-zinc-950 p-4 rounded-lg shadow-xl">
+    <View className="basis-1/4 grow mx-2 h-full bg-white dark:bg-sky-950 p-4 rounded-lg shadow-xl">
       <View className="flex w-100 grow">
         <Text className="text-zinc-600 dark:text-zinc-300 capitalize font-semibold text-sm md:text-base">
           {title}

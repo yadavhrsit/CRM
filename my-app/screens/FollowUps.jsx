@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import { BASE_URL } from "../constants/api";
 import axios from "axios";
 import { useNavigation } from "@react-navigation/native";
+import AddLeadForm from "../components/AddLeadForm";
 
 function FollowUps() {
   const { token, user } = useAuth();
@@ -35,7 +36,7 @@ function FollowUps() {
 
         const response = await axios.get(url, {
           headers: { Authorization: token },
-          params: { page },
+          params: { page, limit: 10 },
         });
         setFollowUps(response.data.followUps);
         setTotalPages(response.data.pages);
@@ -53,47 +54,75 @@ function FollowUps() {
   }, [token, page, notifications, user]);
 
   const handleRowClick = (followUp) => {
-    navigation.navigate("LeadDetails", {
-      id: followUp.lead._id,
-      addFollowUp: user.role === "employee",
+    navigation.navigate("Leads", {
+      screen: "Lead Details",
+      params: {
+        id: followUp.lead._id,
+        addFollowUp: user.role === "employee" || false,
+      },
+      initial: false,
     });
   };
 
   const renderTableHeader = () => (
-    <View className="flex-row bg-blue-100 p-2">
-      <Text className="flex-1 text-center font-bold" style={{ width: 100 }}>
+    <View className="flex-row bg-blue-100 dark:bg-gray-600 p-2">
+      <Text
+        className="flex-1 text-center font-bold text-lg dark:text-white"
+        style={{ width: 100 }}
+      >
         Company
       </Text>
-      <Text className="flex-1 text-center font-bold" style={{ width: 150 }}>
+      <Text
+        className="flex-1 text-center font-bold text-lg dark:text-white"
+        style={{ width: 150 }}
+      >
         Follow Date
       </Text>
-      <Text className="flex-1 text-center font-bold" style={{ width: 300 }}>
+      <Text
+        className="flex-1 text-center font-bold text-lg dark:text-white"
+        style={{ width: 300 }}
+      >
         Remarks
       </Text>
-      <Text className="flex-1 text-center font-bold" style={{ width: 100 }}>
+      <Text
+        className="flex-1 text-center font-bold text-lg dark:text-white"
+        style={{ width: 100 }}
+      >
         Added By
       </Text>
-      <Text className="flex-1 text-center font-bold" style={{ width: 150 }}>
+      <Text
+        className="flex-1 text-center font-bold text-lg dark:text-white"
+        style={{ width: 150 }}
+      >
         Assigned To
       </Text>
-      <Text className="flex-1 text-center font-bold" style={{ width: 100 }}>
+      <Text
+        className="flex-1 text-center font-bold text-lg dark:text-white"
+        style={{ width: 100 }}
+      >
         Status
       </Text>
-      <Text className="flex-1 text-center font-bold" style={{ width: 100 }}>
+      <Text
+        className="flex-1 text-center font-bold text-lg dark:text-white"
+        style={{ width: 100 }}
+      >
         Lead Status
       </Text>
     </View>
   );
 
-
   const renderTableRow = (followUp, index) => (
     <TouchableOpacity
       key={index}
-      className={`flex-row p-2 ${index % 2 === 0 ? "bg-white" : "bg-gray-100"}`}
+      className={`flex-row p-2 ${
+        index % 2 === 0
+          ? "bg-white dark:bg-zinc-900"
+          : "bg-gray-100 dark:bg-zinc-800"
+      }`}
       onPress={() => handleRowClick(followUp)}
     >
       <Text
-        className="flex-1 text-center"
+        className="flex-1 text-center text-lg dark:text-white"
         style={{ width: 100 }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -101,7 +130,7 @@ function FollowUps() {
         {followUp.lead.company.name}
       </Text>
       <Text
-        className="flex-1 text-center"
+        className="flex-1 text-center text-lg dark:text-white"
         style={{ width: 200 }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -109,7 +138,7 @@ function FollowUps() {
         {dayjs(followUp.followDate).format("DD/MM/YYYY")}
       </Text>
       <Text
-        className="flex-1 text-center"
+        className="flex-1 text-center text-lg dark:text-white"
         style={{ width: 300 }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -117,7 +146,7 @@ function FollowUps() {
         {followUp.remarks}
       </Text>
       <Text
-        className="flex-1 text-center"
+        className="flex-1 text-center text-lg dark:text-white"
         style={{ width: 150 }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -125,7 +154,7 @@ function FollowUps() {
         {followUp.addedBy.name}
       </Text>
       <Text
-        className="flex-1 text-center"
+        className="flex-1 text-center text-lg dark:text-white"
         style={{ width: 100 }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -133,7 +162,7 @@ function FollowUps() {
         {followUp.assignedTo.name}
       </Text>
       <Text
-        className="flex-1 text-center"
+        className="flex-1 text-center text-lg dark:text-white"
         style={{ width: 150 }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -141,7 +170,7 @@ function FollowUps() {
         {followUp.status}
       </Text>
       <Text
-        className="flex-1 text-center"
+        className="flex-1 text-center text-lg dark:text-white"
         style={{ width: 100 }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -152,49 +181,52 @@ function FollowUps() {
   );
 
   return (
-    <View className="flex-1 p-4 pt-6 bg-white">
-      {isLoading ? (
-        <View className="flex-1 justify-center items-center">
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text className="text-xl">Loading...</Text>
-        </View>
-      ) : followUps.length === 0 ? (
-        <View className="flex-1 justify-center items-center">
-          <Text className="text-xl">No data available to display</Text>
-        </View>
-      ) : (
-        <>
-          <ScrollView horizontal>
-            <View>
-              {renderTableHeader()}
-              <ScrollView>
-                {followUps.map((followup, index) =>
-                  renderTableRow(followup, index)
-                )}
-              </ScrollView>
-            </View>
-          </ScrollView>
-          <View className="flex-row justify-between items-center mt-4">
-            <Button
-              title="Previous"
-              onPress={() => setPage((prev) => Math.max(prev - 1, 1))}
-              disabled={page === 1}
-            />
-            <Text>
-              Page {page} of {totalPages}
-            </Text>
-            <Button
-              title="Next"
-              onPress={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-              disabled={page === totalPages}
-            />
+    <>
+      <View className="flex-1 p-4 pt-6 bg-white dark:bg-black">
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#2763ad" />
+            <Text className="text-xl">Loading...</Text>
           </View>
-        </>
-      )}
-    </View>
+        ) : followUps.length === 0 ? (
+          <View className="flex-1 justify-center items-center">
+            <Text className="text-xl">No data available to display</Text>
+          </View>
+        ) : (
+          <>
+            <ScrollView horizontal>
+              <View>
+                {renderTableHeader()}
+                <ScrollView>
+                  {followUps.map((followup, index) =>
+                    renderTableRow(followup, index)
+                  )}
+                </ScrollView>
+              </View>
+            </ScrollView>
+            <View className="flex-row justify-between items-center mt-4">
+              <Button
+                title="Previous"
+                onPress={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+              />
+              <Text className="dark:text-white">
+                Page {page} of {totalPages}
+              </Text>
+              <Button
+                title="Next"
+                onPress={() =>
+                  setPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={page === totalPages}
+              />
+            </View>
+          </>
+        )}
+      </View>
+      
+    </>
   );
 }
-
-
 
 export default FollowUps;

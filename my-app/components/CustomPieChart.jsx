@@ -29,12 +29,12 @@ const CustomPieChart = ({ pieData, leadChartInfo }) => {
   };
 
   return (
-    <View style={{marginVertical:10}}>
+    <View style={{ marginVertical: 10 }}>
       <View
+        className="bg-[#2864ad] dark:bg-sky-950"
         style={{
           borderRadius: 10,
           paddingVertical: 10,
-          backgroundColor: "#2864ad",
           justifyContent: "center",
           alignItems: "center",
         }}

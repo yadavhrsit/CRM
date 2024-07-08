@@ -9,16 +9,14 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
+import { useColorScheme } from "nativewind";
 import { useAuth } from "../context/AuthContext";
-import { ThemeContext } from "../context/ThemeContext";
-import { DARK_THEME, LIGHT_THEME } from "../constants/themeConstants";
+
 import { BASE_URL } from "../constants/api";
 
 const Login = () => {
-  const navigation = useNavigation();
+  const { colorScheme, toggleColorScheme } = useColorScheme();
   const { login } = useAuth();
-  const { theme } = useContext(ThemeContext);
-
   const [formData, setFormData] = useState({
     identifier: "",
     password: "",
@@ -48,7 +46,6 @@ const Login = () => {
       return;
     }
 
-
     setLoading(true);
     setError("");
     setSuccess("");
@@ -68,7 +65,6 @@ const Login = () => {
       if (response.ok) {
         login(data.token, data.user);
         setSuccess("Sign In successful.");
-
       } else {
         setError(data.message || "Something went wrong.");
       }
@@ -80,65 +76,72 @@ const Login = () => {
 
   const [showPassword, setShowPassword] = useState(false);
 
-  const isDarkTheme = theme === DARK_THEME;
 
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor: isDarkTheme ? "#000" : "#008dff" },
+        { backgroundColor: colorScheme === "dark" ? "#000" : "#008dff" },
       ]}
     >
-      <StatusBar style={isDarkTheme ? "light" : "dark"} />
-      <Text style={[styles.title, { color: isDarkTheme ? "#FFF" : "#FFF" }]}>
-        Login to Account
-      </Text>
-      <Text style={[styles.subtitle, { color: isDarkTheme ? "#FFF" : "#FFF" }]}>
+      <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+      <Text style={[styles.title, { color: "#FFF" }]}>Login to Account</Text>
+      <Text style={[styles.subtitle, { color: "#FFF" }]}>
         Please enter your email and password to continue
       </Text>
 
       <View
         style={[
           styles.form,
-          { backgroundColor: isDarkTheme ? "#333" : "#FFF" },
+          { backgroundColor: colorScheme === "dark" ? "#333" : "#FFF" },
         ]}
       >
-        <Text style={[styles.label, { color: isDarkTheme ? "#FFF" : "#333" }]}>
+        <Text
+          style={[
+            styles.label,
+            { color: colorScheme === "dark" ? "#FFF" : "#333" },
+          ]}
+        >
           Email/Username/Phone:
         </Text>
         <TextInput
           style={[
             styles.input,
             {
-              backgroundColor: isDarkTheme ? "#555" : "#FFF",
-              color: isDarkTheme ? "#FFF" : "#000",
+              backgroundColor: colorScheme === "dark" ? "#555" : "#FFF",
+              color: colorScheme === "dark" ? "#FFF" : "#000",
             },
           ]}
           placeholder="Enter email, username, or phone"
-          placeholderTextColor={isDarkTheme ? "#CCC" : "#999"}
+          placeholderTextColor={colorScheme === "dark" ? "#CCC" : "#999"}
           value={formData.identifier}
           onChangeText={(text) => handleInputChange("identifier", text)}
           keyboardType="email-address"
           autoCapitalize="none"
         />
 
-        <Text style={[styles.label, { color: isDarkTheme ? "#FFF" : "#333" }]}>
+        <Text
+          style={[
+            styles.label,
+            { color: colorScheme === "dark" ? "#FFF" : "#333" },
+          ]}
+        >
           Password:
         </Text>
         <View
           style={[
             styles.passwordInput,
-            { backgroundColor: isDarkTheme ? "#555" : "#FFF" },
+            { backgroundColor: colorScheme === "dark" ? "#555" : "#FFF" },
           ]}
         >
           <TextInput
             style={[
               styles.passwordField,
-              { color: isDarkTheme ? "#FFF" : "#000" },
+              { color: colorScheme === "dark" ? "#FFF" : "#000" },
             ]}
             secureTextEntry={!showPassword}
             placeholder="Enter your password"
-            placeholderTextColor={isDarkTheme ? "#CCC" : "#999"}
+            placeholderTextColor={colorScheme === "dark" ? "#CCC" : "#999"}
             value={formData.password}
             onChangeText={(text) => handleInputChange("password", text)}
             autoCapitalize="none"
@@ -147,7 +150,7 @@ const Login = () => {
             <Text
               style={[
                 styles.passwordVisibility,
-                { color: isDarkTheme ? "#FFF" : "#333" },
+                { color: colorScheme ? "#FFF" : "#333" },
               ]}
             >
               {showPassword ? "👁️" : "🔒"}
@@ -161,7 +164,7 @@ const Login = () => {
         <TouchableOpacity
           style={[
             styles.button,
-            { backgroundColor: isDarkTheme ? "#666" : "#3B82F6" },
+            { backgroundColor: colorScheme ? "#666" : "#3B82F6" }
           ]}
           onPress={handleSubmit}
           disabled={loading}
