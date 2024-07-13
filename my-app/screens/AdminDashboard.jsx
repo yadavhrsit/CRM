@@ -151,10 +151,14 @@ const AdminDashboard = () => {
   };
 
   const handleRowClick = (lead) => {
-    navigation.navigate("Lead Details", {
-      id: lead._id,
-      addFollowUp: lead.followUps.length === 0,
-    });
+    navigation.navigate(
+      "Leads",
+      { screen: "Lead-Details" },
+      {
+        id: lead._id,
+        addFollowUp: lead.followUps.length === 0,
+      }
+    );
   };
 
   const renderTableHeader = () => (
