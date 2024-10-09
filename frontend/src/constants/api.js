@@ -1,1 +1,1 @@
-export const BASE_URL = "https://crm-gogy.onrender.com/api";
+export const BASE_URL = "http://103.189.172.70/api";
