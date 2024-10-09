@@ -24,13 +24,13 @@ const httpServer = createServer(app);
 initSocket(httpServer);
 
 // Middleware
-app.use(cors(
-  {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST","PUT","DELETE"],
+app.use(
+  cors({
+    origin: "https://nexencast.in",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  }
-));
+  })
+);
 app.use(morgan("dev"));
 app.use(express.json());
 

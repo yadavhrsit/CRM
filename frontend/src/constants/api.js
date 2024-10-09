@@ -1,1 +1,1 @@
-export const BASE_URL = "http://103.189.172.70/api";
+export const BASE_URL = "https://nexencast.in/api";
